@@ -22,16 +22,21 @@ SkillPulse compares a learner profile against recent role-specific job data and 
 - missing high-demand skills
 - rising and declining market signals
 - a skill decay risk score
+- a resume compatibility score
 - a 7-day micro-roadmap
 - a proof pack containing a mini-project idea, resume bullet, and repository description
 
 ## Key Capabilities
 
 - Role- and location-specific job signal analysis
+- Resume upload for `PDF`, `DOCX`, or `TXT` files
 - Skill extraction from profile or resume text
+- Interactive charts for skill coverage, trends, and career paths
 - Explainable trend analysis showing why a skill is rising or declining
+- Curated learning resources for missing skills
+- Profile comparison mode for side-by-side analysis
 - Hybrid data model with curated data, optional live upload, and cache-ready refresh support
-- Downloadable markdown report for sharing or review
+- Downloadable markdown and PDF reports for sharing or review
 - Multiple demo profiles to compare strong and weak role alignment
 
 ## Why SkillPulse Stands Out
@@ -40,6 +45,7 @@ SkillPulse compares a learner profile against recent role-specific job data and 
 - `Utility`: converts skill gaps into concrete, portfolio-oriented action
 - `Explainability`: shows the evidence behind trend shifts
 - `Reliability`: works offline with curated data while remaining compatible with live updates
+- `Interactivity`: uses visual analytics for a stronger demo and easier interpretation
 
 ## Real-World Use Cases
 
@@ -92,6 +98,16 @@ If you want to cite credible external context during judging or in a report:
 pip install -r requirements.txt
 streamlit run app.py
 ```
+
+## Dependencies
+
+- `streamlit` for the web interface
+- `pandas` for data processing
+- `plotly` for interactive charts
+- `pdfplumber` for PDF resume extraction
+- `python-docx` for DOCX resume extraction
+- `fpdf2` for PDF report generation
+- `requests` for optional live-data integration
 
 ## Product Summary
 

@@ -24,8 +24,9 @@ SkillPulse compares a student's profile against a curated dataset of recent job 
 - finds matched and missing skills
 - detects fast-rising skills in the market
 - computes a skill decay risk score
+- computes a resume compatibility score
 - generates a 7-day proof-oriented roadmap
-- produces a downloadable judge report (proof of output)
+- produces a downloadable analysis report
 
 Reliability note (judge-friendly):
 
@@ -53,8 +54,9 @@ Students can immediately decide:
 4. Show extracted skills and market matches.
 5. Show missing skills and trending skills.
 6. Show the skill decay score.
-7. Generate the roadmap and proof pack.
-8. Download the report.
+7. Show the resume compatibility score.
+8. Generate the roadmap and proof pack.
+9. Download the report.
 
 ## SDG alignment (optional, if asked)
 

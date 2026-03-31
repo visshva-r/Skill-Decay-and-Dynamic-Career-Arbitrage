@@ -1,3 +1,7 @@
 streamlit
 pandas
 requests
+plotly
+pdfplumber
+python-docx
+fpdf2
