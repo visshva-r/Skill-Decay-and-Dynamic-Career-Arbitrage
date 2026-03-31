@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import hashlib
+import json
+import os
 import re
 from collections import Counter
 from pathlib import Path
+from urllib.parse import urlparse
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -30,6 +34,7 @@ SAMPLE_RESUME_ALT_PATH = Path("data/sample_resume_alt.txt")
 RESUME_VISSHVA_AIML_PATH = Path("data/resume_visshva_aiml_redacted.txt")
 RESUME_VISSHVA_SDE_PATH = Path("data/resume_visshva_sde_redacted.txt")
 LIVE_CACHE_PATH = Path("data/live_cache.csv")
+SNAPSHOT_HISTORY_PATH = Path("data/profile_snapshots.json")
 
 SKILL_CATALOG = [
     "Excel", "SQL", "Python", "Power BI", "Tableau", "DAX",
@@ -148,6 +153,86 @@ LEARNING_RESOURCES = {
     ],
 }
 
+MICRO_CURRICULUM_TEMPLATES = {
+    "Power BI": [
+        "Connect Power BI to a small relational dataset and clean fields for reporting.",
+        "Create one KPI page, one drill-down page, and one stakeholder summary page.",
+        "Write 3 business insights and 1 recommendation based on the dashboard.",
+    ],
+    "SQL": [
+        "Practice SELECT, JOIN, GROUP BY, and filtering on a realistic analytics dataset.",
+        "Write one CTE and one window-function query for trend analysis.",
+        "Export your best 3 queries into a portfolio-ready SQL script with comments.",
+    ],
+    "Prompt Engineering": [
+        "Design prompts for summarization, extraction, and reasoning over the same dataset.",
+        "Compare outputs using a small evaluation rubric for accuracy and usefulness.",
+        "Turn the best prompt set into a repeatable workflow with before/after examples.",
+    ],
+}
+
+DEFAULT_GITHUB_SKILL_MAP = {
+    "python": "Python",
+    "jupyter notebook": "Python",
+    "typescript": "TypeScript",
+    "javascript": "JavaScript",
+    "html": "HTML",
+    "css": "CSS",
+    "react": "React.js",
+    "next.js": "Next.js",
+    "nextjs": "Next.js",
+    "node": "Node.js",
+    "node.js": "Node.js",
+    "express": "Express.js",
+    "flask": "Flask",
+    "sql": "SQL",
+    "postgresql": "PostgreSQL",
+    "mysql": "MySQL",
+    "mongodb": "MongoDB",
+    "docker": "Docker",
+    "kubernetes": "Kubernetes",
+    "aws": "AWS",
+    "azure": "Azure",
+    "gcp": "GCP",
+    "pandas": "Pandas",
+    "numpy": "NumPy",
+    "scikit-learn": "Scikit-learn",
+    "sklearn": "Scikit-learn",
+    "tensorflow": "TensorFlow",
+    "pytorch": "PyTorch",
+    "nlp": "NLP",
+    "computer-vision": "Computer Vision",
+    "computer vision": "Computer Vision",
+    "power bi": "Power BI",
+    "tableau": "Tableau",
+    "prompt-engineering": "Prompt Engineering",
+    "prompt engineering": "Prompt Engineering",
+    "rest-api": "REST APIs",
+    "rest api": "REST APIs",
+    "api": "REST APIs",
+    "tailwindcss": "Tailwind CSS",
+    "tailwind": "Tailwind CSS",
+    "postman": "Postman",
+    "git": "Git",
+}
+
+ROLE_QUERY_MAP = {
+    "Junior Data Analyst": "junior data analyst",
+    "Frontend Developer": "frontend developer",
+    "AI/ML Intern": "machine learning intern",
+    "Business Analyst": "business analyst",
+    "Data Science Intern": "data science intern",
+    "SDE / Full-stack Developer": "full stack developer",
+}
+
+CITY_TO_STATE_MAP = {
+    "Chennai": "Tamil Nadu",
+    "Bengaluru": "Karnataka",
+    "Hyderabad": "Telangana",
+    "Pune": "Maharashtra",
+    "Gurugram": "Haryana",
+}
+
 CAREER_PATHS = {
     "Junior Data Analyst": {
         "current": "Junior Data Analyst",
@@ -255,6 +340,157 @@ def extract_text_from_upload(uploaded_file) -> str:
     return uploaded_file.read().decode("utf-8", errors="replace")
 
 
+def parse_github_username(raw_value: str) -> str:
+    value = raw_value.strip()
+    if not value:
+        return ""
+    if "github.com" not in value.lower():
+        return value.lstrip("@").strip("/")
+    parsed = urlparse(value)
+    path_parts = [part for part in parsed.path.split("/") if part]
+    return path_parts[0] if path_parts else ""
+
+
+def get_secret(name: str, default: str = "") -> str:
+    env_value = os.getenv(name)
+    if env_value:
+        return env_value
+    try:
+        return st.secrets.get(name, default)
+    except Exception:
+        return default
+
+
+def _github_headers() -> dict[str, str]:
+    token = get_secret("GITHUB_TOKEN")
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "SkillPulse",
+    }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+
+
+@st.cache_data(show_spinner=False, ttl=1800)
+def fetch_github_profile_data(username: str) -> dict[str, object]:
+    if not username:
+        return {"username": "", "skills": [], "summary": "", "repos": []}
+    headers = _github_headers()
+    base_url = f"https://api.github.com/users/{username}"
+    user_response = requests.get(base_url, headers=headers, timeout=15)
+    user_response.raise_for_status()
+    repos_response = requests.get(f"{base_url}/repos?per_page=6&sort=updated", headers=headers, timeout=20)
+    repos_response.raise_for_status()
+    repos = repos_response.json()
+
+    extracted_tokens: list[str] = []
+    repo_summaries: list[str] = []
+    for repo in repos:
+        if repo.get("fork"):
+            continue
+        repo_name = repo.get("name", "")
+        description = repo.get("description") or ""
+        topics = repo.get("topics") or []
+        language = repo.get("language") or ""
+        extracted_tokens.extend([repo_name, description, language, *topics])
+        repo_summaries.append(
+            f"{repo_name}: {description or 'No description'}"
+        )
+    normalized_text = normalize_token(" ".join(extracted_tokens))
+    detected: list[str] = []
+    for token, canonical in DEFAULT_GITHUB_SKILL_MAP.items():
+        if _skill_in_text(normalize_token(token), normalized_text) and canonical not in detected:
+            detected.append(canonical)
+    detected.extend([skill for skill in extract_skills(" ".join(extracted_tokens)) if skill not in detected])
+    summary = user_response.json().get("bio") or ""
+    return {
+        "username": username,
+        "skills": sorted(detected),
+        "summary": summary,
+        "repos": repo_summaries[:5],
+    }
+
+
+def _adzuna_secrets() -> tuple[str, str, str]:
+    app_id = get_secret("ADZUNA_APP_ID")
+    app_key = get_secret("ADZUNA_APP_KEY")
+    country = get_secret("ADZUNA_COUNTRY", "in")
+    return app_id, app_key, country
+
+
+def _extract_api_skills(job_text: str) -> list[str]:
+    skills = extract_skills(job_text)
+    return skills[:8]
+
+
+def _normalize_live_job_row(raw_job: dict, role: str, city: str) -> dict | None:
+    title = raw_job.get("title") or role
+    company_info = raw_job.get("company") or {}
+    company = company_info.get("display_name") if isinstance(company_info, dict) else str(company_info or "Unknown Company")
+    location_info = raw_job.get("location") or {}
+    area = location_info.get("area") if isinstance(location_info, dict) else []
+    detected_city = city
+    if isinstance(area, list) and area:
+        normalized_area = [str(part).strip() for part in area if str(part).strip()]
+        city_matches = [part for part in normalized_area if part.lower() == city.lower()]
+        if city_matches:
+            detected_city = city_matches[0]
+        else:
+            state_name = CITY_TO_STATE_MAP.get(city, "").lower()
+            non_state_parts = [part for part in normalized_area if part.lower() != state_name]
+            detected_city = non_state_parts[-1] if non_state_parts else city
+    description = raw_job.get("description") or ""
+    skill_list = _extract_api_skills(f"{title}\n{description}")
+    if not skill_list:
+        return None
+    posted_date = pd.to_datetime(raw_job.get("created"), errors="coerce")
+    if pd.isna(posted_date):
+        posted_date = pd.Timestamp.utcnow()
+    return {
+        "job_id": raw_job.get("id") or f"adzuna-{hashlib.md5((title + company).encode('utf-8')).hexdigest()[:10]}",
+        "role": role,
+        "city": detected_city or city,
+        "posted_date": posted_date.strftime("%Y-%m-%d"),
+        "title": title,
+        "company": company,
+        "skills": ";".join(skill_list),
+    }
+
+
+def fetch_adzuna_jobs(role: str, city: str, limit: int) -> pd.DataFrame:
+    app_id, app_key, country = _adzuna_secrets()
+    if not app_id or not app_key:
+        raise RuntimeError("Adzuna credentials are missing. Add `ADZUNA_APP_ID` and `ADZUNA_APP_KEY` to enable live refresh.")
+    query = ROLE_QUERY_MAP.get(role, role)
+    state = CITY_TO_STATE_MAP.get(city, "")
+    params = {
+        "app_id": app_id,
+        "app_key": app_key,
+        "results_per_page": min(limit, 50),
+        "what": query,
+        "where": city,
+        "content-type": "application/json",
+    }
+    if state:
+        params["where"] = f"{city}, {state}"
+    response = requests.get(
+        f"https://api.adzuna.com/v1/api/jobs/{country}/search/1",
+        params=params,
+        timeout=25,
+    )
+    response.raise_for_status()
+    results = response.json().get("results", [])
+    rows = []
+    for raw_job in results:
+        normalized = _normalize_live_job_row(raw_job, role=role, city=city)
+        if normalized:
+            rows.append(normalized)
+    if not rows:
+        raise RuntimeError("The live API returned jobs, but none contained recognizable skills for the current role.")
+    return pd.DataFrame(rows)
+
+
 def load_jobs() -> pd.DataFrame:
     df = pd.read_csv(DATA_PATH)
     df["posted_date"] = pd.to_datetime(df["posted_date"])
@@ -291,6 +527,51 @@ def load_cached_jobs() -> pd.DataFrame:
     return _standardize_jobs_df(base)
 
 
+def _load_snapshot_history() -> list[dict[str, object]]:
+    if not SNAPSHOT_HISTORY_PATH.exists():
+        return []
+    try:
+        return json.loads(SNAPSHOT_HISTORY_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+
+def _save_snapshot_history(entries: list[dict[str, object]]) -> None:
+    SNAPSHOT_HISTORY_PATH.write_text(json.dumps(entries, indent=2), encoding="utf-8")
+
+
+def build_profile_key(profile_context: str, role: str, city: str, github_username: str) -> str:
+    fingerprint = f"{normalize_token(profile_context)}|{role}|{city}|{github_username}"
+    return hashlib.sha256(fingerprint.encode("utf-8")).hexdigest()[:16]
+
+
+def record_snapshot(profile_key: str, role: str, city: str, analysis: dict, compatibility_data: dict[str, int], student_skills: list[str]) -> None:
+    history = _load_snapshot_history()
+    today = pd.Timestamp.utcnow().strftime("%Y-%m-%d")
+    entry = {
+        "profile_key": profile_key,
+        "date": today,
+        "role": role,
+        "city": city,
+        "decay_risk": analysis["score"],
+        "compatibility": compatibility_data["overall"],
+        "missing_skills": analysis["missing"][:5],
+        "detected_skills": student_skills[:12],
+    }
+    history = [item for item in history if not (item.get("profile_key") == profile_key and item.get("date") == today)]
+    history.append(entry)
+    history = sorted(history, key=lambda item: (item.get("profile_key", ""), item.get("date", "")))[-200:]
+    _save_snapshot_history(history)
+
+
+def get_profile_history(profile_key: str) -> pd.DataFrame:
+    history = [item for item in _load_snapshot_history() if item.get("profile_key") == profile_key]
+    if not history:
+        return pd.DataFrame()
+    df = pd.DataFrame(history).sort_values("date")
+    return df
+
+
 def _dummy_live_fetch(role: str, city: str, limit: int) -> pd.DataFrame:
     raise RuntimeError(
         "Live refresh is not configured. Provide a job API, or upload a live CSV, or use curated mode."
@@ -298,8 +579,10 @@ def _dummy_live_fetch(role: str, city: str, limit: int) -> pd.DataFrame:
 
 
 def fetch_live_jobs(role: str, city: str, limit: int) -> pd.DataFrame:
-    _ = requests
-    return _dummy_live_fetch(role, city, limit)
+    try:
+        return fetch_adzuna_jobs(role=role, city=city, limit=limit)
+    except Exception as primary_error:
+        raise RuntimeError(str(primary_error)) from primary_error
 
 
 def _skill_in_text(skill_token: str, normalized_text: str) -> bool:
@@ -443,6 +726,104 @@ def build_proof_pack(missing: list[str], student_skills: list[str]) -> dict[str,
     }
 
 
+def build_market_alert(analysis: dict, student_skills: list[str], target_role: str, portfolio_source: str) -> dict[str, str]:
+    rising_missing = [skill for skill in analysis["rising"]["skill"].tolist() if skill not in student_skills]
+    focus_skill = rising_missing[0] if rising_missing else (analysis["missing"][0] if analysis["missing"] else "")
+    if not focus_skill:
+        return {
+            "title": "No critical alert right now",
+            "body": f"Your current profile already covers the strongest visible signals for `{target_role}` in this dataset window.",
+        }
+    row = analysis["trend_df"][analysis["trend_df"]["skill"] == focus_skill].head(1)
+    if row.empty:
+        evidence = f"`{focus_skill}` is appearing more frequently in the recent market window."
+    else:
+        row = row.iloc[0]
+        evidence = (
+            f"`{focus_skill}` appears in {int(row['recent_mentions'])}/{len(analysis['recent_rows']) or 1} recent postings "
+            f"vs {int(row['previous_mentions'])}/{len(analysis['previous_rows']) or 1} older postings."
+        )
+    source_line = f"Based on the provided profile context and portfolio input: `{portfolio_source}`." if portfolio_source else "Based on the provided profile context."
+    return {
+        "title": f"Market alert: `{focus_skill}` is becoming more important",
+        "body": f"{evidence} You do not currently show this skill strongly in your profile. {source_line}",
+    }
+
+
+def generate_micro_curriculum(missing: list[str]) -> list[dict[str, object]]:
+    selected = missing[:3] if missing else ["Power BI", "SQL", "Prompt Engineering"]
+    curriculum = []
+    for skill in selected:
+        resources = LEARNING_RESOURCES.get(skill, [])
+        lessons = MICRO_CURRICULUM_TEMPLATES.get(
+            skill,
+            [
+                f"Study the core concepts behind {skill}.",
+                f"Build one small hands-on exercise using {skill}.",
+                f"Package the result into a visible proof-of-skill artifact.",
+            ],
+        )
+        curriculum.append(
+            {
+                "skill": skill,
+                "lessons": lessons,
+                "resources": resources[:2],
+            }
+        )
+    return curriculum
+
+
+def generate_gemini_curriculum(missing: list[str], role: str, city: str, student_skills: list[str]) -> tuple[str | None, str | None]:
+    api_key = get_secret("GEMINI_API_KEY")
+    if not api_key:
+        return None, "Gemini key not detected."
+    model_name = get_secret("GEMINI_MODEL", "gemini-2.5-flash")
+    focus_skills = missing[:3] if missing else ["Power BI", "SQL", "Prompt Engineering"]
+    prompt = f"""
+You are helping generate a concise, practical micro-curriculum for an early-career candidate.
+
+Target role: {role}
+City: {city}
+Current detected skills: {", ".join(student_skills) if student_skills else "None"}
+Missing high-demand skills: {", ".join(focus_skills)}
+
+Create a 4-hour proof-oriented learning plan in markdown with these sections:
+1. Goal
+2. 3 learning steps
+3. 1 mini project idea
+4. 2 concrete portfolio outcomes
+
+Keep it realistic, concise, and suitable for a student project demo.
+""".strip()
+    response = requests.post(
+        f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent",
+        params={"key": api_key},
+        headers={"Content-Type": "application/json"},
+        json={
+            "contents": [
+                {
+                    "parts": [
+                        {"text": prompt}
+                    ]
+                }
+            ]
+        },
+        timeout=30,
+    )
+    if not response.ok:
+        return None, f"Gemini API error {response.status_code} on `{model_name}`: {response.text[:220]}"
+    data = response.json()
+    candidates = data.get("candidates") or []
+    if not candidates:
+        return None, "Gemini returned no candidates."
+    parts = candidates[0].get("content", {}).get("parts", [])
+    text_parts = [part.get("text", "") for part in parts if part.get("text")]
+    generated = "\n".join(text_parts).strip()
+    if not generated:
+        return None, "Gemini returned an empty response."
+    return generated, None
+
+
 def score_label(score: int) -> str:
     if score >= 75:
         return "High risk"
@@ -523,6 +904,16 @@ def build_career_path_chart(role: str, student_skills: list[str]) -> go.Figure:
         colors.append("#28a745" if readiness >= 70 else "#ffc107" if readiness >= 40 else "#dc3545")
     fig = go.Figure(go.Treemap(labels=labels, parents=parents, values=[max(value, 10) for value in values], marker=dict(colors=colors), textinfo="label+text", text=[f"Readiness: {value}%" if index > 0 else "You are here" for index, value in enumerate(values)]))
     fig.update_layout(height=350, margin=dict(l=10, r=10, t=30, b=10))
+    return fig
+
+
+def build_history_chart(history_df: pd.DataFrame) -> go.Figure:
+    fig = go.Figure()
+    if history_df.empty:
+        return fig
+    fig.add_trace(go.Scatter(x=history_df["date"], y=history_df["compatibility"], mode="lines+markers", name="Resume Compatibility", line=dict(color="#667eea", width=3)))
+    fig.add_trace(go.Scatter(x=history_df["date"], y=history_df["decay_risk"], mode="lines+markers", name="Skill Decay Risk", line=dict(color="#dc3545", width=3)))
+    fig.update_layout(height=300, margin=dict(l=10, r=10, t=30, b=10), yaxis_title="Score", xaxis_title="Snapshot Date")
     return fig
 
 
@@ -618,16 +1009,19 @@ def main() -> None:
             "Profile source",
             options=[
                 "Uploaded Resume" if resume_upload else "Upload a resume above",
+                "Fresh profile",
                 "Sample (Strong match)",
                 "Sample (Weak match)",
                 "Resume (Visshva - AIML/Data)",
                 "Resume (Visshva - SDE/Full-stack)",
                 "Custom paste",
             ],
-            index=1 if not resume_upload else 0,
+            index=1,
         )
         if "Uploaded Resume" in profile_choice and uploaded_resume_text:
             profile_text = uploaded_resume_text
+        elif profile_choice == "Fresh profile":
+            profile_text = ""
         elif profile_choice == "Sample (Strong match)":
             profile_text = SAMPLE_RESUME_PATH.read_text(encoding="utf-8")
         elif profile_choice == "Sample (Weak match)":
@@ -638,7 +1032,27 @@ def main() -> None:
             profile_text = RESUME_VISSHVA_SDE_PATH.read_text(encoding="utf-8")
         else:
             profile_text = ""
-        profile_text = st.text_area("Edit or paste profile text", value=profile_text, height=220)
+        profile_text = st.text_area(
+            "Edit or paste profile text",
+            value=profile_text,
+            height=220,
+            placeholder="Paste a fresh resume summary, skills, projects, or achievements here...",
+        )
+        portfolio_source = st.text_input(
+            "GitHub / portfolio URL or notes (optional)",
+            placeholder="https://github.com/username or brief portfolio notes",
+        )
+        github_username = parse_github_username(portfolio_source)
+        github_data = {"username": "", "skills": [], "summary": "", "repos": []}
+        if github_username:
+            try:
+                with st.spinner("Analyzing GitHub profile..."):
+                    github_data = fetch_github_profile_data(github_username)
+                st.success(f"Loaded public GitHub signals for @{github_username}")
+                if github_data["skills"]:
+                    st.caption("GitHub-detected skills: " + ", ".join(github_data["skills"][:8]))
+            except Exception as error:
+                st.warning(f"GitHub analysis unavailable: {error}")
         st.divider()
         st.subheader("Data Source")
         uploaded_csv = st.file_uploader("Upload a live jobs CSV (optional)", type=["csv"])
@@ -663,11 +1077,38 @@ def main() -> None:
         st.error("No job postings available for this role/city combination in the current dataset.")
         st.stop()
 
-    student_skills = extract_skills(profile_text)
+    github_profile_text = ""
+    if github_data["summary"]:
+        github_profile_text += f"\nGitHub bio: {github_data['summary']}"
+    if github_data["repos"]:
+        github_profile_text += "\nRecent repositories:\n- " + "\n- ".join(github_data["repos"])
+    if github_data["skills"]:
+        github_profile_text += "\nGitHub-detected skills: " + ", ".join(github_data["skills"])
+
+    profile_context = profile_text
+    if portfolio_source.strip():
+        profile_context = f"{profile_text}\n{portfolio_source.strip()}"
+    if github_profile_text.strip():
+        profile_context = f"{profile_context}\n{github_profile_text}".strip()
+
+    student_skills = extract_skills(profile_context)
     analysis = analyze_market(filtered_jobs, student_skills)
     roadmap = roadmap_for_skills(analysis["missing"])
     proof_pack = build_proof_pack(analysis["missing"], student_skills)
-    compatibility_data = compute_resume_compatibility(student_skills, analysis["required_skills"], profile_text, role)
+    compatibility_data = compute_resume_compatibility(student_skills, analysis["required_skills"], profile_context, role)
+    market_alert = build_market_alert(analysis, student_skills, role, portfolio_source.strip())
+    micro_curriculum = generate_micro_curriculum(analysis["missing"])
+    gemini_curriculum = None
+    gemini_status = "Gemini not checked yet."
+    try:
+        gemini_curriculum, gemini_error = generate_gemini_curriculum(analysis["missing"], role, city, student_skills)
+        gemini_status = "Gemini live generation enabled." if gemini_curriculum else (gemini_error or "Gemini did not return content.")
+    except Exception as error:
+        gemini_curriculum = None
+        gemini_status = f"Gemini request failed: {error}"
+    profile_key = build_profile_key(profile_context, role, city, github_data.get("username", ""))
+    record_snapshot(profile_key, role, city, analysis, compatibility_data, student_skills)
+    history_df = get_profile_history(profile_key)
 
     metrics = st.columns(4)
     metrics[0].metric("Job Postings Analyzed", len(filtered_jobs))
@@ -676,7 +1117,15 @@ def main() -> None:
     metrics[3].metric("Skill Decay Risk", f"{analysis['score']}/100", score_label(analysis["score"]))
     st.caption(f"Trend window: recent postings since **{analysis['recent_cutoff'].date()}** vs older postings.")
 
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Dashboard", "Market Trends", "Resume Compatibility", "Roadmap & Proof Pack", "Learning Resources", "Career Paths"])
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+        "Dashboard",
+        "Market Trends",
+        "Resume Compatibility",
+        "Roadmap & Proof Pack",
+        "Micro-Curriculum",
+        "Learning Resources",
+        "Career Paths",
+    ])
 
     with tab1:
         left, right = st.columns([1.1, 0.9])
@@ -735,6 +1184,10 @@ def main() -> None:
                 st.markdown(f"**{label}** — `{compatibility_data[key]}%`")
                 st.progress(compatibility_data[key] / 100)
                 st.caption(caption)
+            if github_data["username"]:
+                st.markdown("**GitHub Signal Overlay**")
+                st.caption("Public GitHub repositories and topics are folded into the profile context to make the analysis closer to a portfolio-aware evaluation.")
+                st.write(f"GitHub profile analyzed: `@{github_data['username']}`")
 
     with tab4:
         road_left, road_right = st.columns(2)
@@ -798,6 +1251,39 @@ def main() -> None:
                 st.caption("Install `fpdf2` for PDF report downloads.")
 
     with tab5:
+        st.markdown('<p class="section-header">Continuous Skill Alert</p>', unsafe_allow_html=True)
+        st.warning(market_alert["title"])
+        st.write(market_alert["body"])
+        st.markdown('<p class="section-header">Profile Snapshot History</p>', unsafe_allow_html=True)
+        if len(history_df) >= 1:
+            st.plotly_chart(build_history_chart(history_df), use_container_width=True)
+            latest = history_df.iloc[-1]
+            if len(history_df) > 1:
+                previous = history_df.iloc[-2]
+                st.caption(
+                    f"Latest snapshot: compatibility {latest['compatibility']}% ({latest['compatibility'] - previous['compatibility']:+} vs previous), "
+                    f"decay risk {latest['decay_risk']} ({latest['decay_risk'] - previous['decay_risk']:+} vs previous)."
+                )
+            else:
+                st.caption("This is the first saved snapshot for this profile-role combination. Revisit after edits or skill updates to show progress over time.")
+        st.markdown('<p class="section-header">Micro-Curriculum Generator</p>', unsafe_allow_html=True)
+        st.caption("A short, proof-oriented curriculum generated from the strongest missing market signals.")
+        for block in micro_curriculum:
+            with st.expander(block["skill"], expanded=block["skill"] == micro_curriculum[0]["skill"]):
+                for idx, lesson in enumerate(block["lessons"], start=1):
+                    st.markdown(f"{idx}. {lesson}")
+                if block["resources"]:
+                    st.markdown("**Suggested resources**")
+                    for resource in block["resources"]:
+                        st.markdown(f"- [{resource['title']}]({resource['url']}) — {resource['type']} ({resource['time']})")
+        st.markdown('<p class="section-header">Gemini Vision Layer</p>', unsafe_allow_html=True)
+        st.caption(gemini_status)
+        if gemini_curriculum:
+            st.markdown(gemini_curriculum)
+        else:
+            st.caption("Gemini-enhanced curriculum is optional. Add `GEMINI_API_KEY` in Streamlit secrets or environment variables to enable live generation.")
+
+    with tab6:
         st.markdown('<p class="section-header">Recommended Learning Resources</p>', unsafe_allow_html=True)
         target_skills = analysis["missing"] if analysis["missing"] else list(LEARNING_RESOURCES.keys())[:3]
         for skill in target_skills:
@@ -811,7 +1297,7 @@ def main() -> None:
                 with st.expander(skill):
                     st.caption(f"No curated resources yet for {skill}.")
 
-    with tab6:
+    with tab7:
         st.markdown('<p class="section-header">Career Path Progression</p>', unsafe_allow_html=True)
         st.plotly_chart(build_career_path_chart(role, student_skills), use_container_width=True)
 

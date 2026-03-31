@@ -1,0 +1,13 @@
+job_id,role,city,posted_date,title,company,skills
+101,Junior Data Analyst,Chennai,2026-03-31,Junior Data Analyst,InsightNova,"SQL;Excel;Power BI;Python;Dashboard Storytelling;Data Cleaning"
+102,Junior Data Analyst,Bengaluru,2026-03-31,Analytics Associate,Metric Loop,"SQL;Python;Power BI;Statistics;Prompt Engineering;LLM-assisted Analytics"
+103,Junior Data Analyst,Hyderabad,2026-03-30,BI Analyst Associate,DashMint,"SQL;Excel;Power BI;DAX;Data Modeling;Stakeholder Reporting"
+104,Frontend Developer,Chennai,2026-03-31,Frontend Developer,PixelForge,"React.js;TypeScript;HTML;CSS;REST APIs;Git"
+105,Frontend Developer,Bengaluru,2026-03-30,Frontend Engineer,WebSpring,"React.js;Next.js;TypeScript;Tailwind CSS;JavaScript;Figma"
+106,Frontend Developer,Hyderabad,2026-03-29,UI Engineer,Northstar Labs,"React.js;TypeScript;REST APIs;Tailwind CSS;Postman;Git"
+107,AI/ML Intern,Chennai,2026-03-31,AI Intern,ModelHive,"Python;Machine Learning;Pandas;NumPy;Scikit-learn;Prompt Engineering"
+108,AI/ML Intern,Bengaluru,2026-03-30,ML Research Intern,TensorDock,"Python;PyTorch;NLP;Deep Learning;HuggingFace Transformers;Git"
+109,AI/ML Intern,Hyderabad,2026-03-29,Computer Vision Intern,VisionStack,"Python;Computer Vision;TensorFlow;NumPy;Pandas;Docker"
+110,Business Analyst,Chennai,2026-03-31,Business Analyst,SignalForge,"Excel;SQL;Business Analysis;Documentation;Presentation Skills;Stakeholder Reporting"
+111,Business Analyst,Bengaluru,2026-03-30,BA Associate,ClearMatrix,"Excel;Power BI;Business Analysis;KPI Tracking;Dashboard Storytelling;Communication"
+112,Data Science Intern,Chennai,2026-03-31,Data Science Intern,Quantum Reach,"Python;Pandas;NumPy;Machine Learning;SQL;EDA"

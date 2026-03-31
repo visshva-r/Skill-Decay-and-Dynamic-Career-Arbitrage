@@ -2,7 +2,7 @@
 
 ## One-line pitch
 
-`SkillPulse` is a job-signal intelligence tool for students that detects skill decay from recent local job postings and generates a proof-oriented roadmap to stay employable.
+`SkillPulse` is a continuous skill-intelligence tool for students that compares resumes and GitHub signals against live or curated job-market demand, then generates proof-oriented learning actions.
 
 ## Problem
 
@@ -18,24 +18,28 @@ Most existing platforms recommend generic courses. They do not show:
 
 ## Solution
 
-SkillPulse compares a student's profile against a curated dataset of recent job postings for a chosen role and city. It then:
+SkillPulse compares a student's profile against recent job postings for a chosen role and city. It then:
 
 - extracts the student's current skills
+- enriches the profile using optional GitHub repository signals
 - finds matched and missing skills
 - detects fast-rising skills in the market
 - computes a skill decay risk score
 - computes a resume compatibility score
-- generates a 7-day proof-oriented roadmap
+- tracks profile snapshots over time
+- generates a 7-day and Gemini-enhanced proof-oriented roadmap
 - produces a downloadable analysis report
 
 Reliability note (judge-friendly):
 
-- the system is offline-safe using curated data, but also supports optional live refresh and caching to capture real-time drift when available.
+- the system is offline-safe using curated data, but also supports optional Adzuna-powered live refresh and caching to capture real-time drift when available.
 
 ## Novelty
 
+- `Continuous Skill Alert`: highlights a rising skill that the current profile does not show strongly
 - `Skill Decay Meter`: shows which previously common skills are being replaced by newer expectations
 - `Proof Pack`: suggests what to build, how to describe it on a resume, and how to package it on GitHub
+- `GitHub Signal Overlay`: folds public repository metadata into profile analysis
 - `Local market view`: grounds the analysis in one city and one role instead of generic global advice
 
 ## Utility
@@ -49,14 +53,14 @@ Students can immediately decide:
 ## Demo flow
 
 1. Open SkillPulse.
-2. Choose `Junior Data Analyst` in `Chennai`.
-3. Load the sample student profile (or the weak-match profile to show contrast).
-4. Show extracted skills and market matches.
-5. Show missing skills and trending skills.
-6. Show the skill decay score.
-7. Show the resume compatibility score.
-8. Generate the roadmap and proof pack.
-9. Download the report.
+2. Start with `Fresh profile`.
+3. Choose a target role and city, or upload the richer live jobs CSV.
+4. Paste a short profile or upload a resume.
+5. Optionally paste a GitHub profile URL to activate GitHub-aware analysis.
+6. Show extracted skills, missing skills, and trend evidence.
+7. Show the resume compatibility score and skill decay risk.
+8. Open `Continuous Skill Alert`, `Profile Snapshot History`, and `Gemini Vision Layer`.
+9. Show the roadmap, proof pack, and downloadable report.
 
 ## SDG alignment (optional, if asked)
 
@@ -65,4 +69,4 @@ Students can immediately decide:
 
 ## Demo closing line
 
-`We are not just telling students what to learn. We are showing what the market changed, what they are missing, and how to prove those skills quickly.`
+`We are not just telling students what to learn. We show what the market changed, what the student's profile misses, and what they should build next to stay employable.`

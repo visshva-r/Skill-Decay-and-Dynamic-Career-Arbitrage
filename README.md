@@ -33,6 +33,10 @@ SkillPulse compares a learner profile against recent role-specific job data and 
 - Skill extraction from profile or resume text
 - Interactive charts for skill coverage, trends, and career paths
 - Explainable trend analysis showing why a skill is rising or declining
+- GitHub-aware profile enrichment using public repository signals
+- Snapshot history to show how compatibility and skill-decay risk change over time
+- Optional Gemini-powered micro-curriculum generation when an API key is configured
+- Optional Adzuna-powered live refresh for real-time job signals
 - Curated learning resources for missing skills
 - Profile comparison mode for side-by-side analysis
 - Hybrid data model with curated data, optional live upload, and cache-ready refresh support
@@ -81,7 +85,8 @@ If you want to cite credible external context during judging or in a report:
 ## Project Structure
 
 - `app.py`: Streamlit application
-- `data/job_postings.csv`: curated role-specific job dataset
+- `data/job_postings.csv`: curated multi-role, multi-city job dataset
+- `data/live_jobs_sample.csv`: upload-ready sample live jobs CSV
 - `data/sample_resume.txt`: sample profile with stronger alignment
 - `data/sample_resume_alt.txt`: sample profile with weaker alignment
 - `data/resume_visshva_aiml_redacted.txt`: your AIML/data resume content (redacted)
@@ -108,6 +113,9 @@ streamlit run app.py
 - `python-docx` for DOCX resume extraction
 - `fpdf2` for PDF report generation
 - `requests` for optional live-data integration
+- public GitHub API support for portfolio-aware analysis
+- Gemini API support through `GEMINI_API_KEY` for live curriculum generation
+- Adzuna API support through `ADZUNA_APP_ID` and `ADZUNA_APP_KEY` for live refresh
 
 ## Product Summary
 

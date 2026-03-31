@@ -16,19 +16,19 @@ Our system analyzes recent job postings for a specific role and city, compares t
 
 Let me show the demo.
 
-Here we selected the role `Junior Data Analyst` in `Chennai`. We load a sample student profile with skills like Excel, SQL, Python, and data cleaning.
+We start with a fresh profile instead of a fixed template. Here we select a target role and city, then either paste a profile, upload a resume, or add a GitHub profile URL.
 
-The system extracts the student's skills and compares them with current market signals from recent job postings. On the left, we can see which skills already match the market and which important skills are still missing.
+The system extracts the student's skills and compares them with current market signals from recent job postings. If a GitHub profile is provided, SkillPulse also uses repository signals to enrich the analysis. On the left, we can see which skills already match the market and which important skills are still missing.
 
 Below that, we show trending market signals. This captures novelty in our project, because we are not only recommending skills, we are detecting market drift. For example, the dashboard can show that `Power BI`, `Dashboard Storytelling`, or `LLM-assisted Analytics` are gaining more demand compared to older postings.
 
-We also show a `Skill Decay Risk Score`. This tells the student how risky their current profile is compared to what the market now expects.
+We also show a `Skill Decay Risk Score` and a `Resume Compatibility Score`. This tells the student how risky their current profile is compared to what the market now expects.
 
-On the right, the platform generates a `7-day micro-roadmap`. This is not just theory. It tells the student what to practice and what to build next.
+Next, the platform generates a `Continuous Skill Alert`, which highlights the most important rising skill the student is not yet showing strongly. It also stores profile snapshots, so the student can see how their compatibility and decay risk change over time.
 
-Finally, we generate a `Proof Pack`, which includes a mini-project title, a project idea, a resume bullet, and a GitHub-ready description. This makes the system highly useful because the student can immediately convert guidance into evidence.
+Finally, we generate a `7-day micro-roadmap`, a Gemini-enhanced micro-curriculum, and a `Proof Pack`, which includes a mini-project title, a project idea, a resume bullet, and a GitHub-ready description. This makes the system highly useful because the student can immediately convert guidance into evidence.
 
-So the novelty of SkillPulse is that it combines skill trend detection, personal gap analysis, and proof-oriented career guidance in one simple system.
+So the novelty of SkillPulse is that it combines skill trend detection, portfolio-aware gap analysis, and proof-oriented career guidance in one simple system.
 
 The utility is that a student can immediately understand what the market changed, what they are missing, and how to act on it.
 

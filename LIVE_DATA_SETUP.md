@@ -8,6 +8,24 @@ For a winning expo demo, use **hybrid mode**:
 
 This avoids demo failure while still letting you claim *real-time capable*.
 
+## Optional Gemini Vision Upgrade
+
+If you want the app to generate a live micro-curriculum instead of only using the built-in templates:
+
+1. Create a Gemini API key.
+2. Add `GEMINI_API_KEY` to Streamlit secrets or your local environment.
+3. Re-run the app.
+
+The app will continue to work without this key; Gemini simply upgrades the curriculum section when available.
+
+## Optional GitHub Signal Upgrade
+
+Paste a public GitHub profile URL in the sidebar.
+
+- SkillPulse will read public repository metadata through the GitHub API.
+- Detected stack/language signals are merged into the profile analysis.
+- This makes the demo closer to a portfolio-aware continuous monitoring workflow.
+
 ## Fastest path (no API keys)
 
 Use the in-app uploader:
@@ -19,11 +37,26 @@ Use the in-app uploader:
 
 ## With an API (optional)
 
-If you have a job API available (RapidAPI, Adzuna, etc.), wire it into:
+SkillPulse now supports an Adzuna-based live refresh path.
 
-- `fetch_live_jobs()` in `app.py`
+Add these secrets locally or in Streamlit Cloud:
 
-Return a DataFrame with the same columns as above. When the **Refresh live signals** button is clicked, the app caches the results into `data/live_cache.csv`.
+```toml
+ADZUNA_APP_ID = "your_app_id"
+ADZUNA_APP_KEY = "your_app_key"
+ADZUNA_COUNTRY = "in"
+```
+
+Then click **Refresh live signals** in the sidebar.
+
+What happens:
+
+- the app queries Adzuna for the selected role and city
+- extracts recognizable skills from returned job descriptions
+- normalizes them into the same CSV schema
+- caches the result into `data/live_cache.csv`
+
+If no Adzuna credentials are provided, the app will still work in curated mode or with uploaded CSV files.
 
 ## What to say to judges
 
