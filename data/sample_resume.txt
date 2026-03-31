@@ -1,0 +1,22 @@
+Riya Sharma
+Final Year B.Tech Student
+Chennai
+
+Profile
+Aspiring junior data analyst with strong fundamentals in Excel, SQL, Python basics, and data cleaning. Built small academic dashboards and classroom analytics assignments.
+
+Skills
+- Excel
+- SQL
+- Python
+- Data Cleaning
+- Data Visualization
+- Statistics
+- Presentation Skills
+
+Projects
+- Student Performance Dashboard using Excel charts and pivot tables
+- Sales Trend Analysis using Python notebooks and CSV data
+
+Goal
+Looking for an entry-level data analyst role in Chennai.

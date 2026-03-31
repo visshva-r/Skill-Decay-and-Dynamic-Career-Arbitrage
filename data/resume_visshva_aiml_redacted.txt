@@ -1,0 +1,18 @@
+Visshva Ramasubramanian
+SRM Institute of Science and Technology, Chennai
+Integrated M.Tech in Artificial Intelligence (3rd Year) — Expected Graduation: May 2028
+
+Target: AI/ML / Data Science roles
+
+Technical Skills
+- Languages: Python, Java, C++, SQL
+- Machine Learning: Scikit-learn, XGBoost, Pandas, NumPy
+- AI & NLP: HuggingFace Transformers, DistilGPT-2
+- Web and APIs: Flask, React.js
+- Tools: Git, Jupyter Notebook
+
+Projects (high-level)
+- Customer Churn Prediction (XGBoost, Streamlit)
+- AI Password Strength Analyzer (Flask API, React UI)
+- NLP Email Subject Generator (Transformers, ROUGE evaluation)
+- Weather Dashboard (React + OpenWeatherMap)

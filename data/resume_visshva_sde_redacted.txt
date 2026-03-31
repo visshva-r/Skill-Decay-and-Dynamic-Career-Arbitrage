@@ -1,0 +1,17 @@
+Visshva Ramasubramanian
+SRM Institute of Science and Technology, Chennai
+Integrated M.Tech in Artificial Intelligence (3rd Year) — Expected Graduation: May 2028
+
+Target: SDE / Full-stack roles
+
+Technical Skills
+- Languages: Python, Java, C++, SQL, JavaScript
+- Web & Backend: HTML, CSS, React.js, Node.js, Express.js, REST APIs
+- Databases: MySQL, MongoDB, PostgreSQL
+- Tools: Git, Postman, Docker
+
+Projects (high-level)
+- MediQ — full-stack app (Next.js, Supabase, PostgreSQL, Prisma, NextAuth, Tailwind)
+- QR-Based Event Check-In System (Node/Express, MongoDB, JWT, React)
+- Weather Dashboard (React + OpenWeatherMap)
+- AI Password Strength Analyzer (Flask API, React UI)
