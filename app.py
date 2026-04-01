@@ -7,6 +7,7 @@ import html
 import json
 import os
 import re
+import time
 from collections import Counter
 from pathlib import Path
 from urllib.parse import urlparse
@@ -117,6 +118,14 @@ SKILL_CATEGORIES = {
 }
 
 LEARNING_RESOURCES = {
+    "Business Analysis": [
+        {"title": "Business Analysis Basics - Microsoft Learn", "url": "https://learn.microsoft.com/en-us/training/modules/get-started-with-business-analysis/", "type": "Official Guide", "time": "2 hrs"},
+        {"title": "What is Business Analysis? - IIBA", "url": "https://www.iiba.org/business-analysis-blogs/what-is-business-analysis/", "type": "Article", "time": "30 min"},
+    ],
+    "Excel": [
+        {"title": "Excel Video Training - Microsoft Support", "url": "https://support.microsoft.com/en-us/excel", "type": "Official Training", "time": "4 hrs"},
+        {"title": "Excel for Beginners - Great Learning", "url": "https://www.mygreatlearning.com/academy/learn-for-free/courses/excel-for-beginners", "type": "Course", "time": "2 hrs"},
+    ],
     "Power BI": [
         {"title": "Microsoft Power BI Learning Path", "url": "https://learn.microsoft.com/en-us/training/powerplatform/power-bi", "type": "Official Docs", "time": "10 hrs"},
         {"title": "Power BI Full Course - freeCodeCamp", "url": "https://www.youtube.com/watch?v=3u7MQz1EyPY", "type": "Video", "time": "4 hrs"},
@@ -918,7 +927,7 @@ def generate_micro_curriculum(missing: list[str]) -> list[dict[str, object]]:
     selected = missing[:3] if missing else ["Power BI", "SQL", "Prompt Engineering"]
     curriculum = []
     for skill in selected:
-        resources = LEARNING_RESOURCES.get(skill, [])
+        resources = get_learning_resources(skill)
         lessons = MICRO_CURRICULUM_TEMPLATES.get(
             skill,
             [
@@ -955,14 +964,31 @@ Create a 4-hour proof-oriented learning plan in markdown with these sections:
 
 Keep it realistic, concise, and suitable for a student project demo.
 """.strip()
-    response = requests.post(
-        f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent",
-        params={"key": api_key},
-        headers={"Content-Type": "application/json"},
-        json={"contents": [{"parts": [{"text": prompt}]}]},
-        timeout=30,
-    )
+    response = None
+    last_error = None
+    for attempt in range(3):
+        try:
+            response = requests.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent",
+                params={"key": api_key},
+                headers={"Content-Type": "application/json"},
+                json={"contents": [{"parts": [{"text": prompt}]}]},
+                timeout=30,
+            )
+        except requests.RequestException as error:
+            last_error = str(error)
+            response = None
+        if response is not None and response.ok:
+            break
+        if response is not None and response.status_code != 503:
+            break
+        if attempt < 2:
+            time.sleep(1.5 * (attempt + 1))
+    if response is None:
+        return None, f"Gemini request failed: {last_error or 'Unknown network error.'}"
     if not response.ok:
+        if response.status_code == 503:
+            return None, "Gemini is temporarily unavailable right now. The built-in curriculum below is still available, so you can keep using the app and try again shortly."
         return None, f"Gemini API error {response.status_code} on `{model_name}`: {response.text[:220]}"
     data = response.json()
     candidates = data.get("candidates") or []
@@ -982,6 +1008,32 @@ def score_label(score: int) -> str:
     if score >= 45:
         return "Medium risk"
     return "Low risk"
+
+
+def get_learning_resources(skill: str) -> list[dict[str, str]]:
+    resources = LEARNING_RESOURCES.get(skill)
+    if resources:
+        return resources
+    query = skill.replace(" ", "+")
+    return [
+        {
+            "title": f"{skill} learning path",
+            "url": f"https://www.google.com/search?q={query}+learning+path",
+            "type": "Search Guide",
+            "time": "Varies",
+        },
+        {
+            "title": f"{skill} hands-on tutorial",
+            "url": f"https://www.youtube.com/results?search_query={query}+tutorial",
+            "type": "Video Search",
+            "time": "Varies",
+        },
+    ]
+
+
+def show_gemini_setup_hint(gemini_status: str) -> bool:
+    lowered = gemini_status.lower()
+    return "key not detected" in lowered or "api key" in lowered
 
 
 def format_salary_lpa(amount: int) -> str:
@@ -1600,22 +1652,18 @@ def main() -> None:
         st.caption(gemini_status)
         if gemini_curriculum:
             st.markdown(gemini_curriculum)
-        else:
+        elif show_gemini_setup_hint(gemini_status):
             st.caption("Gemini-enhanced curriculum is optional. Add `GEMINI_API_KEY` in Streamlit secrets or environment variables to enable live generation.")
 
     with tab7:
         st.markdown('<p class="section-header">Recommended Learning Resources</p>', unsafe_allow_html=True)
         target_skills = analysis["missing"] if analysis["missing"] else list(LEARNING_RESOURCES.keys())[:3]
         for skill in target_skills:
-            resources = LEARNING_RESOURCES.get(skill)
-            if resources:
-                with st.expander(skill, expanded=skill == target_skills[0]):
-                    for resource in resources:
-                        st.markdown(f"**{resource['title']}** -- _{resource['type']}_ ({resource['time']})  \n[Open Resource]({resource['url']})")
-                        st.divider()
-            else:
-                with st.expander(skill):
-                    st.caption(f"No curated resources yet for {skill}.")
+            resources = get_learning_resources(skill)
+            with st.expander(skill, expanded=skill == target_skills[0]):
+                for resource in resources:
+                    st.markdown(f"**{resource['title']}** -- _{resource['type']}_ ({resource['time']})  \n[Open Resource]({resource['url']})")
+                    st.divider()
 
         st.markdown('<p class="section-header">Hackathons & Competitions</p>', unsafe_allow_html=True)
         st.caption("Recommended based on your missing skills and career goals.")
