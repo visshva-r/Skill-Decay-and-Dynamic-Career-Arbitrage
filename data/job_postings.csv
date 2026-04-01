@@ -1,48 +1,57 @@
-job_id,role,city,posted_date,title,company,skills
-1,Junior Data Analyst,Chennai,2026-03-30,Junior Data Analyst,InsightNova,"Excel;SQL;Power BI;Python;Data Cleaning;Dashboard Storytelling"
-2,Junior Data Analyst,Chennai,2026-03-27,BI Analyst Associate,SparkWave,"Power BI;SQL;DAX;Excel;Dashboard Storytelling;Stakeholder Reporting"
-3,Junior Data Analyst,Chennai,2026-03-21,Analytics Associate,Quantum Reach,"Python;SQL;Power BI;Excel;LLM-assisted Analytics;Prompt Engineering"
-4,Junior Data Analyst,Chennai,2026-02-24,Junior Reporting Analyst,BlueGrid,"Excel;SQL;Python;Data Visualization;Tableau;Presentation Skills"
-5,Junior Data Analyst,Chennai,2026-02-16,Operations Data Analyst,ClearMatrix,"SQL;Excel;Python;Tableau;Problem Solving;ETL Basics"
-6,Junior Data Analyst,Bengaluru,2026-03-31,Analytics Associate,Metric Loop,"SQL;Python;Power BI;Statistics;Prompt Engineering;LLM-assisted Analytics"
-7,Junior Data Analyst,Bengaluru,2026-03-25,Junior BI Analyst,Northstar Data,"SQL;Power BI;Excel;Data Modeling;Dashboard Storytelling;Communication"
-8,Junior Data Analyst,Bengaluru,2026-02-28,Data Analyst Intern,BlueGrid,"SQL;Excel;Tableau;Python;Reporting;Statistics"
-9,Junior Data Analyst,Hyderabad,2026-03-30,BI Analyst Associate,DashMint,"SQL;Excel;Power BI;DAX;Data Modeling;Stakeholder Reporting"
-10,Junior Data Analyst,Hyderabad,2026-03-18,Junior Insights Analyst,Cloud Prism,"Python;SQL;Power BI;A/B Testing;Excel;Storytelling"
-11,Junior Data Analyst,Hyderabad,2026-02-20,Reporting Analyst,VividPeak,"Excel;SQL;Tableau;MIS Reporting;Communication;Documentation"
-12,Frontend Developer,Chennai,2026-03-31,Frontend Developer,PixelForge,"React.js;TypeScript;HTML;CSS;REST APIs;Git"
-13,Frontend Developer,Chennai,2026-03-24,UI Engineer,Northstar Labs,"React.js;TypeScript;Tailwind CSS;REST APIs;Postman;Git"
-14,Frontend Developer,Chennai,2026-02-18,React Developer,BlueGrid,"React.js;JavaScript;HTML;CSS;Bootstrap;Git"
-15,Frontend Developer,Bengaluru,2026-03-30,Frontend Engineer,WebSpring,"React.js;Next.js;TypeScript;Tailwind CSS;JavaScript;Figma"
-16,Frontend Developer,Bengaluru,2026-03-22,UI Developer,SignalForge,"React.js;TypeScript;Next.js;REST APIs;Tailwind CSS;Agile"
-17,Frontend Developer,Bengaluru,2026-02-19,Frontend Developer,Metric Loop,"React.js;JavaScript;Bootstrap;HTML;CSS;REST APIs"
-18,Frontend Developer,Hyderabad,2026-03-29,UI Engineer,ClearMatrix,"React.js;TypeScript;REST APIs;Tailwind CSS;Postman;Git"
-19,Frontend Developer,Hyderabad,2026-03-17,Frontend Associate,NexaInsights,"React.js;TypeScript;Next.js;CSS;Agile;Figma"
-20,Frontend Developer,Hyderabad,2026-02-15,Web Developer,Axis Harbor,"JavaScript;React.js;HTML;CSS;Bootstrap;Git"
-21,AI/ML Intern,Chennai,2026-03-31,AI Intern,ModelHive,"Python;Machine Learning;Pandas;NumPy;Scikit-learn;Prompt Engineering"
-22,AI/ML Intern,Chennai,2026-03-20,ML Intern,Quantum Reach,"Python;PyTorch;NLP;HuggingFace Transformers;Git;Pandas"
-23,AI/ML Intern,Chennai,2026-02-21,Data Science Intern,InsightNova,"Python;Scikit-learn;Pandas;NumPy;Matplotlib;SQL"
-24,AI/ML Intern,Bengaluru,2026-03-30,ML Research Intern,TensorDock,"Python;PyTorch;NLP;Deep Learning;HuggingFace Transformers;Git"
-25,AI/ML Intern,Bengaluru,2026-03-18,Applied AI Intern,VividPeak,"Python;Prompt Engineering;LLM-assisted Analytics;Pandas;REST APIs;Docker"
-26,AI/ML Intern,Bengaluru,2026-02-22,Computer Vision Intern,VisionStack,"Python;TensorFlow;Computer Vision;NumPy;Pandas;Git"
-27,AI/ML Intern,Hyderabad,2026-03-29,Computer Vision Intern,VisionStack,"Python;Computer Vision;TensorFlow;NumPy;Pandas;Docker"
-28,AI/ML Intern,Hyderabad,2026-03-16,Generative AI Intern,MarketSpring,"Python;Prompt Engineering;NLP;HuggingFace Transformers;REST APIs;Git"
-29,AI/ML Intern,Hyderabad,2026-02-18,ML Intern,SparkWave,"Python;Scikit-learn;Pandas;NumPy;SQL;Git"
-30,Business Analyst,Chennai,2026-03-31,Business Analyst,SignalForge,"Excel;SQL;Business Analysis;Documentation;Presentation Skills;Stakeholder Reporting"
-31,Business Analyst,Chennai,2026-03-22,BA Associate,Cloud Prism,"Excel;Power BI;Business Analysis;KPI Tracking;Dashboard Storytelling;Communication"
-32,Business Analyst,Chennai,2026-02-20,Analyst Trainee,Axis Harbor,"Excel;Documentation;Reporting;Tableau;Communication;Business Analysis"
-33,Business Analyst,Bengaluru,2026-03-30,BA Associate,ClearMatrix,"Excel;Power BI;Business Analysis;KPI Tracking;Dashboard Storytelling;Communication"
-34,Business Analyst,Bengaluru,2026-03-18,Product Analyst,NexaInsights,"SQL;Business Analysis;Documentation;Presentation Skills;REST APIs;Agile"
-35,Business Analyst,Bengaluru,2026-02-16,Functional Analyst,Northstar Data,"Excel;Documentation;Reporting;Communication;Tableau;JIRA"
-36,Business Analyst,Hyderabad,2026-03-28,Business Analyst,Metric Loop,"Excel;SQL;Business Analysis;Documentation;JSON;Agile"
-37,Business Analyst,Hyderabad,2026-03-14,Techno-Functional Analyst,DashMint,"SQL;Business Analysis;REST APIs;Stakeholder Reporting;JIRA;Communication"
-38,Business Analyst,Hyderabad,2026-02-12,Analyst Associate,BlueGrid,"Excel;Documentation;Reporting;Presentation Skills;Communication;Tableau"
-39,Data Science Intern,Chennai,2026-03-31,Data Science Intern,Quantum Reach,"Python;Pandas;NumPy;Machine Learning;SQL;EDA"
-40,Data Science Intern,Chennai,2026-03-19,Applied Data Science Intern,SignalForge,"Python;Scikit-learn;SQL;Statistics;Pandas;Data Visualization"
-41,Data Science Intern,Chennai,2026-02-18,Data Science Trainee,UrbanIQ,"Python;Pandas;NumPy;Statistics;Tableau;SQL"
-42,Data Science Intern,Bengaluru,2026-03-30,Data Science Intern,Metric Loop,"Python;Machine Learning;Pandas;NumPy;SQL;Prompt Engineering"
-43,Data Science Intern,Bengaluru,2026-03-17,Analytics Science Intern,Northstar Labs,"Python;Scikit-learn;Pandas;Statistics;Power BI;SQL"
-44,Data Science Intern,Bengaluru,2026-02-22,Data Analyst Intern,BlueGrid,"Python;Pandas;NumPy;Data Visualization;Tableau;SQL"
-45,Data Science Intern,Hyderabad,2026-03-29,Data Science Intern,VisionStack,"Python;Machine Learning;Pandas;NumPy;SQL;Computer Vision"
-46,Data Science Intern,Hyderabad,2026-03-15,AI Analytics Intern,Cloud Prism,"Python;Prompt Engineering;LLM-assisted Analytics;Pandas;SQL;Statistics"
-47,Data Science Intern,Hyderabad,2026-02-14,Data Science Trainee,SparkWave,"Python;Pandas;NumPy;Scikit-learn;Tableau;SQL"
+job_id,role,city,posted_date,title,company,skills,salary_min,salary_max,positions
+1,Junior Data Analyst,Chennai,2026-03-30,Junior Data Analyst,InsightNova,"Excel;SQL;Power BI;Python;Data Cleaning;Dashboard Storytelling",300000,500000,2
+2,Junior Data Analyst,Chennai,2026-03-27,BI Analyst Associate,SparkWave,"Power BI;SQL;DAX;Excel;Dashboard Storytelling;Stakeholder Reporting",350000,550000,1
+3,Junior Data Analyst,Chennai,2026-03-21,Analytics Associate,Quantum Reach,"Python;SQL;Power BI;Excel;LLM-assisted Analytics;Prompt Engineering",400000,600000,3
+4,Junior Data Analyst,Chennai,2026-02-24,Junior Reporting Analyst,BlueGrid,"Excel;SQL;Python;Data Visualization;Tableau;Presentation Skills",280000,450000,1
+5,Junior Data Analyst,Chennai,2026-02-16,Operations Data Analyst,ClearMatrix,"SQL;Excel;Python;Tableau;Problem Solving;ETL Basics",320000,480000,2
+6,Junior Data Analyst,Bengaluru,2026-03-31,Analytics Associate,Metric Loop,"SQL;Python;Power BI;Statistics;Prompt Engineering;LLM-assisted Analytics",450000,700000,2
+7,Junior Data Analyst,Bengaluru,2026-03-25,Junior BI Analyst,Northstar Data,"SQL;Power BI;Excel;Data Modeling;Dashboard Storytelling;Communication",400000,620000,1
+8,Junior Data Analyst,Bengaluru,2026-02-28,Data Analyst Intern,BlueGrid,"SQL;Excel;Tableau;Python;Reporting;Statistics",300000,450000,3
+9,Junior Data Analyst,Hyderabad,2026-03-30,BI Analyst Associate,DashMint,"SQL;Excel;Power BI;DAX;Data Modeling;Stakeholder Reporting",350000,560000,1
+10,Junior Data Analyst,Hyderabad,2026-03-18,Junior Insights Analyst,Cloud Prism,"Python;SQL;Power BI;A/B Testing;Excel;Storytelling",380000,580000,2
+11,Junior Data Analyst,Hyderabad,2026-02-20,Reporting Analyst,VividPeak,"Excel;SQL;Tableau;MIS Reporting;Communication;Documentation",300000,470000,1
+12,Frontend Developer,Chennai,2026-03-31,Frontend Developer,PixelForge,"React.js;TypeScript;HTML;CSS;REST APIs;Git",500000,800000,2
+13,Frontend Developer,Chennai,2026-03-24,UI Engineer,Northstar Labs,"React.js;TypeScript;Tailwind CSS;REST APIs;Postman;Git",550000,850000,1
+14,Frontend Developer,Chennai,2026-02-18,React Developer,BlueGrid,"React.js;JavaScript;HTML;CSS;Bootstrap;Git",400000,650000,2
+15,Frontend Developer,Bengaluru,2026-03-30,Frontend Engineer,WebSpring,"React.js;Next.js;TypeScript;Tailwind CSS;JavaScript;Figma",600000,950000,3
+16,Frontend Developer,Bengaluru,2026-03-22,UI Developer,SignalForge,"React.js;TypeScript;Next.js;REST APIs;Tailwind CSS;Agile",650000,1000000,2
+17,Frontend Developer,Bengaluru,2026-02-19,Frontend Developer,Metric Loop,"React.js;JavaScript;Bootstrap;HTML;CSS;REST APIs",450000,700000,1
+18,Frontend Developer,Hyderabad,2026-03-29,UI Engineer,ClearMatrix,"React.js;TypeScript;REST APIs;Tailwind CSS;Postman;Git",500000,780000,2
+19,Frontend Developer,Hyderabad,2026-03-17,Frontend Associate,NexaInsights,"React.js;TypeScript;Next.js;CSS;Agile;Figma",480000,750000,1
+20,Frontend Developer,Hyderabad,2026-02-15,Web Developer,Axis Harbor,"JavaScript;React.js;HTML;CSS;Bootstrap;Git",380000,600000,2
+21,AI/ML Intern,Chennai,2026-03-31,AI Intern,ModelHive,"Python;Machine Learning;Pandas;NumPy;Scikit-learn;Prompt Engineering",350000,550000,2
+22,AI/ML Intern,Chennai,2026-03-20,ML Intern,Quantum Reach,"Python;PyTorch;NLP;HuggingFace Transformers;Git;Pandas",400000,600000,1
+23,AI/ML Intern,Chennai,2026-02-21,Data Science Intern,InsightNova,"Python;Scikit-learn;Pandas;NumPy;Matplotlib;SQL",300000,480000,2
+24,AI/ML Intern,Bengaluru,2026-03-30,ML Research Intern,TensorDock,"Python;PyTorch;NLP;Deep Learning;HuggingFace Transformers;Git",500000,750000,1
+25,AI/ML Intern,Bengaluru,2026-03-18,Applied AI Intern,VividPeak,"Python;Prompt Engineering;LLM-assisted Analytics;Pandas;REST APIs;Docker",550000,800000,2
+26,AI/ML Intern,Bengaluru,2026-02-22,Computer Vision Intern,VisionStack,"Python;TensorFlow;Computer Vision;NumPy;Pandas;Git",400000,620000,1
+27,AI/ML Intern,Hyderabad,2026-03-29,Computer Vision Intern,VisionStack,"Python;Computer Vision;TensorFlow;NumPy;Pandas;Docker",420000,650000,2
+28,AI/ML Intern,Hyderabad,2026-03-16,Generative AI Intern,MarketSpring,"Python;Prompt Engineering;NLP;HuggingFace Transformers;REST APIs;Git",450000,700000,1
+29,AI/ML Intern,Hyderabad,2026-02-18,ML Intern,SparkWave,"Python;Scikit-learn;Pandas;NumPy;SQL;Git",350000,520000,2
+30,Business Analyst,Chennai,2026-03-31,Business Analyst,SignalForge,"Excel;SQL;Business Analysis;Documentation;Presentation Skills;Stakeholder Reporting",400000,650000,1
+31,Business Analyst,Chennai,2026-03-22,BA Associate,Cloud Prism,"Excel;Power BI;Business Analysis;KPI Tracking;Dashboard Storytelling;Communication",450000,700000,2
+32,Business Analyst,Chennai,2026-02-20,Analyst Trainee,Axis Harbor,"Excel;Documentation;Reporting;Tableau;Communication;Business Analysis",320000,500000,1
+33,Business Analyst,Bengaluru,2026-03-30,BA Associate,ClearMatrix,"Excel;Power BI;Business Analysis;KPI Tracking;Dashboard Storytelling;Communication",500000,780000,2
+34,Business Analyst,Bengaluru,2026-03-18,Product Analyst,NexaInsights,"SQL;Business Analysis;Documentation;Presentation Skills;REST APIs;Agile",550000,850000,1
+35,Business Analyst,Bengaluru,2026-02-16,Functional Analyst,Northstar Data,"Excel;Documentation;Reporting;Communication;Tableau;JIRA",380000,600000,1
+36,Business Analyst,Hyderabad,2026-03-28,Business Analyst,Metric Loop,"Excel;SQL;Business Analysis;Documentation;JSON;Agile",420000,670000,2
+37,Business Analyst,Hyderabad,2026-03-14,Techno-Functional Analyst,DashMint,"SQL;Business Analysis;REST APIs;Stakeholder Reporting;JIRA;Communication",480000,720000,1
+38,Business Analyst,Hyderabad,2026-02-12,Analyst Associate,BlueGrid,"Excel;Documentation;Reporting;Presentation Skills;Communication;Tableau",350000,540000,1
+39,Data Science Intern,Chennai,2026-03-31,Data Science Intern,Quantum Reach,"Python;Pandas;NumPy;Machine Learning;SQL;EDA",380000,580000,2
+40,Data Science Intern,Chennai,2026-03-19,Applied Data Science Intern,SignalForge,"Python;Scikit-learn;SQL;Statistics;Pandas;Data Visualization",420000,640000,1
+41,Data Science Intern,Chennai,2026-02-18,Data Science Trainee,UrbanIQ,"Python;Pandas;NumPy;Statistics;Tableau;SQL",300000,480000,2
+42,Data Science Intern,Bengaluru,2026-03-30,Data Science Intern,Metric Loop,"Python;Machine Learning;Pandas;NumPy;SQL;Prompt Engineering",500000,750000,2
+43,Data Science Intern,Bengaluru,2026-03-17,Analytics Science Intern,Northstar Labs,"Python;Scikit-learn;Pandas;Statistics;Power BI;SQL",480000,720000,1
+44,Data Science Intern,Bengaluru,2026-02-22,Data Analyst Intern,BlueGrid,"Python;Pandas;NumPy;Data Visualization;Tableau;SQL",350000,550000,1
+45,Data Science Intern,Hyderabad,2026-03-29,Data Science Intern,VisionStack,"Python;Machine Learning;Pandas;NumPy;SQL;Computer Vision",430000,680000,2
+46,Data Science Intern,Hyderabad,2026-03-15,AI Analytics Intern,Cloud Prism,"Python;Prompt Engineering;LLM-assisted Analytics;Pandas;SQL;Statistics",460000,700000,1
+47,Data Science Intern,Hyderabad,2026-02-14,Data Science Trainee,SparkWave,"Python;Pandas;NumPy;Scikit-learn;Tableau;SQL",320000,500000,2
+48,SDE / Full-stack Developer,Bengaluru,2026-03-30,Full Stack Developer,CodeHarbor,"JavaScript;TypeScript;React.js;Node.js;REST APIs;PostgreSQL",700000,1200000,3
+49,SDE / Full-stack Developer,Bengaluru,2026-03-18,Software Engineer,Northstar Labs,"JavaScript;React.js;Node.js;Docker;MongoDB;Git",650000,1100000,2
+50,SDE / Full-stack Developer,Bengaluru,2026-02-20,Backend Engineer,Quantum Reach,"Node.js;Express.js;PostgreSQL;Docker;REST APIs;AWS",750000,1300000,2
+51,SDE / Full-stack Developer,Pune,2026-03-29,Full Stack Developer,DevMint,"React.js;TypeScript;Node.js;MySQL;REST APIs;Docker",650000,1050000,2
+52,SDE / Full-stack Developer,Pune,2026-03-14,Software Developer,BlueGrid,"JavaScript;React.js;Express.js;MongoDB;Git;Postman",550000,900000,2
+53,SDE / Full-stack Developer,Gurugram,2026-03-27,SDE I,Cloud Prism,"TypeScript;Next.js;Node.js;PostgreSQL;Docker;CI/CD",800000,1400000,1
+54,Junior Data Analyst,Pune,2026-03-28,Data Analyst Trainee,InsightSphere,"Excel;SQL;Power BI;Python;Dashboard Storytelling;Statistics",380000,620000,2
+55,Business Analyst,Gurugram,2026-03-26,Business Analyst,FinEdge,"Excel;SQL;Business Analysis;Documentation;Stakeholder Reporting;JIRA",500000,820000,1
+56,AI/ML Intern,Pune,2026-03-25,Applied ML Intern,ModelForge,"Python;Machine Learning;Pandas;Scikit-learn;Prompt Engineering;Git",420000,680000,2

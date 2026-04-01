@@ -1,6 +1,9 @@
 from __future__ import annotations
+from dotenv import load_dotenv
+load_dotenv()
 
 import hashlib
+import html
 import json
 import os
 import re
@@ -27,6 +30,8 @@ try:
     from fpdf import FPDF
 except ImportError:
     FPDF = None
+
+MAX_UPLOAD_SIZE_MB = 10
 
 DATA_PATH = Path("data/job_postings.csv")
 SAMPLE_RESUME_PATH = Path("data/sample_resume.txt")
@@ -172,48 +177,24 @@ MICRO_CURRICULUM_TEMPLATES = {
 }
 
 DEFAULT_GITHUB_SKILL_MAP = {
-    "python": "Python",
-    "jupyter notebook": "Python",
-    "typescript": "TypeScript",
-    "javascript": "JavaScript",
-    "html": "HTML",
-    "css": "CSS",
-    "react": "React.js",
-    "next.js": "Next.js",
-    "nextjs": "Next.js",
-    "node": "Node.js",
-    "node.js": "Node.js",
-    "express": "Express.js",
-    "flask": "Flask",
-    "sql": "SQL",
-    "postgresql": "PostgreSQL",
-    "mysql": "MySQL",
-    "mongodb": "MongoDB",
-    "docker": "Docker",
-    "kubernetes": "Kubernetes",
-    "aws": "AWS",
-    "azure": "Azure",
-    "gcp": "GCP",
-    "pandas": "Pandas",
-    "numpy": "NumPy",
-    "scikit-learn": "Scikit-learn",
-    "sklearn": "Scikit-learn",
-    "tensorflow": "TensorFlow",
-    "pytorch": "PyTorch",
-    "nlp": "NLP",
-    "computer-vision": "Computer Vision",
-    "computer vision": "Computer Vision",
-    "power bi": "Power BI",
-    "tableau": "Tableau",
-    "prompt-engineering": "Prompt Engineering",
-    "prompt engineering": "Prompt Engineering",
-    "rest-api": "REST APIs",
-    "rest api": "REST APIs",
-    "api": "REST APIs",
-    "tailwindcss": "Tailwind CSS",
-    "tailwind": "Tailwind CSS",
-    "postman": "Postman",
-    "git": "Git",
+    "python": "Python", "jupyter notebook": "Python",
+    "typescript": "TypeScript", "javascript": "JavaScript",
+    "html": "HTML", "css": "CSS",
+    "react": "React.js", "next.js": "Next.js", "nextjs": "Next.js",
+    "node": "Node.js", "node.js": "Node.js",
+    "express": "Express.js", "flask": "Flask",
+    "sql": "SQL", "postgresql": "PostgreSQL", "mysql": "MySQL", "mongodb": "MongoDB",
+    "docker": "Docker", "kubernetes": "Kubernetes",
+    "aws": "AWS", "azure": "Azure", "gcp": "GCP",
+    "pandas": "Pandas", "numpy": "NumPy",
+    "scikit-learn": "Scikit-learn", "sklearn": "Scikit-learn",
+    "tensorflow": "TensorFlow", "pytorch": "PyTorch",
+    "nlp": "NLP", "computer-vision": "Computer Vision", "computer vision": "Computer Vision",
+    "power bi": "Power BI", "tableau": "Tableau",
+    "prompt-engineering": "Prompt Engineering", "prompt engineering": "Prompt Engineering",
+    "rest-api": "REST APIs", "rest api": "REST APIs", "api": "REST APIs",
+    "tailwindcss": "Tailwind CSS", "tailwind": "Tailwind CSS",
+    "postman": "Postman", "git": "Git",
 }
 
 ROLE_QUERY_MAP = {
@@ -234,13 +215,10 @@ CITY_TO_STATE_MAP = {
 }
 
 CITY_ALIAS_MAP = {
-    "bangalore": "Bengaluru",
-    "bengaluru": "Bengaluru",
-    "madras": "Chennai",
-    "chennai": "Chennai",
+    "bangalore": "Bengaluru", "bengaluru": "Bengaluru",
+    "madras": "Chennai", "chennai": "Chennai",
     "hyderabad": "Hyderabad",
-    "gurgaon": "Gurugram",
-    "gurugram": "Gurugram",
+    "gurgaon": "Gurugram", "gurugram": "Gurugram",
 }
 
 CAREER_PATHS = {
@@ -271,7 +249,141 @@ CAREER_PATHS = {
             {"role": "Tech Lead", "years": "4-6 yrs", "key_skills": ["Agile", "Communication", "Docker", "CI/CD"]},
         ],
     },
+    "AI/ML Intern": {
+        "current": "AI/ML Intern",
+        "paths": [
+            {"role": "ML Engineer", "years": "1-2 yrs", "key_skills": ["Python", "PyTorch", "Machine Learning", "Docker"]},
+            {"role": "Data Scientist", "years": "2-3 yrs", "key_skills": ["Python", "Statistics", "Scikit-learn", "SQL"]},
+            {"role": "NLP Engineer", "years": "2-4 yrs", "key_skills": ["NLP", "HuggingFace Transformers", "Python", "Deep Learning"]},
+            {"role": "AI Research Engineer", "years": "3-5 yrs", "key_skills": ["Deep Learning", "PyTorch", "Computer Vision", "NLP"]},
+        ],
+    },
+    "Business Analyst": {
+        "current": "Business Analyst",
+        "paths": [
+            {"role": "Senior BA", "years": "2-3 yrs", "key_skills": ["Business Analysis", "SQL", "Power BI", "Stakeholder Reporting"]},
+            {"role": "Product Manager", "years": "3-5 yrs", "key_skills": ["Business Analysis", "Agile", "Communication", "JIRA"]},
+            {"role": "Data Analyst Lead", "years": "3-4 yrs", "key_skills": ["SQL", "Power BI", "Dashboard Storytelling", "KPI Tracking"]},
+            {"role": "Strategy Consultant", "years": "5-7 yrs", "key_skills": ["Business Analysis", "Presentation Skills", "Communication", "Documentation"]},
+        ],
+    },
+    "Data Science Intern": {
+        "current": "Data Science Intern",
+        "paths": [
+            {"role": "Data Scientist", "years": "1-2 yrs", "key_skills": ["Python", "Machine Learning", "Statistics", "SQL"]},
+            {"role": "ML Engineer", "years": "2-3 yrs", "key_skills": ["Python", "PyTorch", "Docker", "REST APIs"]},
+            {"role": "Analytics Engineer", "years": "2-4 yrs", "key_skills": ["SQL", "Python", "ETL Basics", "Power BI"]},
+            {"role": "AI Product Specialist", "years": "3-5 yrs", "key_skills": ["Machine Learning", "Prompt Engineering", "Communication", "Agile"]},
+        ],
+    },
 }
+
+# --- Hackathon Recommendations ---
+HACKATHON_MAP = {
+    "Machine Learning": [
+        {"name": "Kaggle Competitions", "url": "https://www.kaggle.com/competitions", "platform": "Kaggle", "type": "Ongoing"},
+        {"name": "Google ML Challenge", "url": "https://developers.google.com/machine-learning", "platform": "Google", "type": "Annual"},
+    ],
+    "Deep Learning": [
+        {"name": "Kaggle Competitions", "url": "https://www.kaggle.com/competitions", "platform": "Kaggle", "type": "Ongoing"},
+    ],
+    "NLP": [
+        {"name": "SemEval Shared Tasks", "url": "https://semeval.github.io/", "platform": "ACL", "type": "Annual"},
+        {"name": "Kaggle NLP Competitions", "url": "https://www.kaggle.com/competitions?tagIds=11208", "platform": "Kaggle", "type": "Ongoing"},
+    ],
+    "Computer Vision": [
+        {"name": "Kaggle Vision Competitions", "url": "https://www.kaggle.com/competitions", "platform": "Kaggle", "type": "Ongoing"},
+    ],
+    "Python": [
+        {"name": "Unstop Hackathons", "url": "https://unstop.com/hackathons", "platform": "Unstop", "type": "Rolling"},
+        {"name": "HackerRank Challenges", "url": "https://www.hackerrank.com/domains/python", "platform": "HackerRank", "type": "Ongoing"},
+    ],
+    "React.js": [
+        {"name": "MLH Hackathons", "url": "https://mlh.io/seasons/2026/events", "platform": "MLH", "type": "Seasonal"},
+        {"name": "Devpost Hackathons", "url": "https://devpost.com/hackathons", "platform": "Devpost", "type": "Rolling"},
+    ],
+    "TypeScript": [
+        {"name": "MLH Hackathons", "url": "https://mlh.io/seasons/2026/events", "platform": "MLH", "type": "Seasonal"},
+        {"name": "Devpost Hackathons", "url": "https://devpost.com/hackathons", "platform": "Devpost", "type": "Rolling"},
+    ],
+    "Next.js": [
+        {"name": "Vercel Hackathons", "url": "https://devpost.com/hackathons", "platform": "Devpost", "type": "Rolling"},
+    ],
+    "Docker": [
+        {"name": "Docker Community Challenges", "url": "https://www.docker.com/community", "platform": "Docker", "type": "Periodic"},
+    ],
+    "SQL": [
+        {"name": "HackerRank SQL Challenges", "url": "https://www.hackerrank.com/domains/sql", "platform": "HackerRank", "type": "Ongoing"},
+        {"name": "StrataScratch Practice", "url": "https://www.stratascratch.com/", "platform": "StrataScratch", "type": "Ongoing"},
+    ],
+    "Power BI": [
+        {"name": "Maven Analytics Challenges", "url": "https://mavenanalytics.io/challenges", "platform": "Maven Analytics", "type": "Monthly"},
+    ],
+    "Tableau": [
+        {"name": "Makeover Monday", "url": "https://www.makeovermonday.co.uk/", "platform": "Community", "type": "Weekly"},
+    ],
+    "Prompt Engineering": [
+        {"name": "Unstop AI Hackathons", "url": "https://unstop.com/hackathons", "platform": "Unstop", "type": "Rolling"},
+    ],
+    "Data Visualization": [
+        {"name": "Makeover Monday", "url": "https://www.makeovermonday.co.uk/", "platform": "Community", "type": "Weekly"},
+    ],
+    "Excel": [
+        {"name": "Excel World Championship", "url": "https://fmworldcup.com/", "platform": "FMWC", "type": "Annual"},
+    ],
+    "Node.js": [
+        {"name": "Devpost Hackathons", "url": "https://devpost.com/hackathons", "platform": "Devpost", "type": "Rolling"},
+    ],
+    "REST APIs": [
+        {"name": "Postman API Hackathons", "url": "https://www.postman.com/", "platform": "Postman", "type": "Periodic"},
+    ],
+}
+
+# --- Benchmark Profiles (Placed Professionals) ---
+BENCHMARK_PROFILES = {
+    "Junior Data Analyst": {
+        "label": "Placed Junior Data Analyst (1 yr exp)",
+        "skills": ["Excel", "SQL", "Python", "Power BI", "Tableau", "Data Cleaning",
+                   "Dashboard Storytelling", "Data Visualization", "Statistics", "EDA",
+                   "Stakeholder Reporting", "Presentation Skills"],
+        "summary": "Placed at a mid-size analytics firm in Bengaluru after completing a data analytics bootcamp. Built 3 dashboards during internship. Strong SQL and Excel foundation with Power BI proficiency.",
+    },
+    "Frontend Developer": {
+        "label": "Placed Frontend Developer (1 yr exp)",
+        "skills": ["React.js", "TypeScript", "JavaScript", "HTML", "CSS", "Next.js",
+                   "Tailwind CSS", "REST APIs", "Git", "Figma", "Postman", "Agile"],
+        "summary": "Placed at a product startup in Chennai. Built 2 production React apps during internship. Strong TypeScript and Next.js skills with CI/CD experience.",
+    },
+    "AI/ML Intern": {
+        "label": "Placed AI/ML Engineer (1 yr exp)",
+        "skills": ["Python", "Machine Learning", "Deep Learning", "PyTorch", "Scikit-learn",
+                   "Pandas", "NumPy", "NLP", "HuggingFace Transformers", "Docker",
+                   "Prompt Engineering", "Git"],
+        "summary": "Placed at an AI research lab in Hyderabad. Published 1 conference paper. Built NLP pipelines and deployed models using Docker and REST APIs.",
+    },
+    "Business Analyst": {
+        "label": "Placed Business Analyst (1 yr exp)",
+        "skills": ["Excel", "SQL", "Power BI", "Business Analysis", "Documentation",
+                   "Presentation Skills", "Stakeholder Reporting", "KPI Tracking",
+                   "Dashboard Storytelling", "Communication", "Agile", "JIRA"],
+        "summary": "Placed at a consulting firm in Pune. Led 2 client-facing reporting projects. Strong documentation and stakeholder management skills.",
+    },
+    "Data Science Intern": {
+        "label": "Placed Data Scientist (1 yr exp)",
+        "skills": ["Python", "Machine Learning", "Scikit-learn", "Pandas", "NumPy",
+                   "SQL", "Statistics", "EDA", "Data Visualization", "Power BI",
+                   "Prompt Engineering", "Git"],
+        "summary": "Placed at a fintech company in Bengaluru. Built 2 ML models in production. Strong statistical foundation with visualization skills.",
+    },
+    "SDE / Full-stack Developer": {
+        "label": "Placed Full-Stack Developer (1 yr exp)",
+        "skills": ["JavaScript", "TypeScript", "React.js", "Node.js", "Express.js",
+                   "Next.js", "PostgreSQL", "MongoDB", "Docker", "REST APIs",
+                   "Git", "CI/CD", "Agile"],
+        "summary": "Placed at a SaaS startup in Bengaluru. Shipped 3 full-stack features end-to-end. Strong backend + DevOps awareness.",
+    },
+}
+
 
 CUSTOM_CSS = """
 <style>
@@ -306,6 +418,7 @@ CUSTOM_CSS = """
     .skill-matched { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     .skill-missing { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
     .skill-rising { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+    .skill-benchmark { background-color: #cce5ff; color: #004085; border: 1px solid #b8daff; }
     .section-header {
         font-size: 1.3rem;
         font-weight: 700;
@@ -324,7 +437,7 @@ def normalize_token(text: str) -> str:
 
 def extract_text_from_pdf(uploaded_file) -> str:
     if pdfplumber is None:
-        return "[PDF extraction unavailable — install pdfplumber]"
+        return "[PDF extraction unavailable -- install pdfplumber]"
     text_parts = []
     with pdfplumber.open(uploaded_file) as pdf:
         for page in pdf.pages:
@@ -336,12 +449,14 @@ def extract_text_from_pdf(uploaded_file) -> str:
 
 def extract_text_from_docx(uploaded_file) -> str:
     if python_docx is None:
-        return "[DOCX extraction unavailable — install python-docx]"
+        return "[DOCX extraction unavailable -- install python-docx]"
     doc = python_docx.Document(uploaded_file)
     return "\n".join(para.text for para in doc.paragraphs if para.text.strip())
 
 
 def extract_text_from_upload(uploaded_file) -> str:
+    if uploaded_file.size > MAX_UPLOAD_SIZE_MB * 1024 * 1024:
+        return f"[File too large. Maximum allowed size is {MAX_UPLOAD_SIZE_MB} MB]"
     name = uploaded_file.name.lower()
     if name.endswith(".pdf"):
         return extract_text_from_pdf(uploaded_file)
@@ -404,9 +519,7 @@ def fetch_github_profile_data(username: str) -> dict[str, object]:
         topics = repo.get("topics") or []
         language = repo.get("language") or ""
         extracted_tokens.extend([repo_name, description, language, *topics])
-        repo_summaries.append(
-            f"{repo_name}: {description or 'No description'}"
-        )
+        repo_summaries.append(f"{repo_name}: {description or 'No description'}")
     normalized_text = normalize_token(" ".join(extracted_tokens))
     detected: list[str] = []
     for token, canonical in DEFAULT_GITHUB_SKILL_MAP.items():
@@ -430,8 +543,7 @@ def _adzuna_secrets() -> tuple[str, str, str]:
 
 
 def _extract_api_skills(job_text: str) -> list[str]:
-    skills = extract_skills(job_text)
-    return skills[:8]
+    return extract_skills(job_text)[:8]
 
 
 def _normalize_live_job_row(raw_job: dict, role: str, city: str) -> dict | None:
@@ -457,6 +569,8 @@ def _normalize_live_job_row(raw_job: dict, role: str, city: str) -> dict | None:
     posted_date = pd.to_datetime(raw_job.get("created"), errors="coerce")
     if pd.isna(posted_date):
         posted_date = pd.Timestamp.utcnow()
+    sal_min = raw_job.get("salary_min") or 0
+    sal_max = raw_job.get("salary_max") or 0
     return {
         "job_id": raw_job.get("id") or f"adzuna-{hashlib.md5((title + company).encode('utf-8')).hexdigest()[:10]}",
         "role": role,
@@ -465,6 +579,9 @@ def _normalize_live_job_row(raw_job: dict, role: str, city: str) -> dict | None:
         "title": title,
         "company": company,
         "skills": ";".join(skill_list),
+        "salary_min": sal_min,
+        "salary_max": sal_max,
+        "positions": 1,
     }
 
 
@@ -490,7 +607,9 @@ def fetch_adzuna_jobs(role: str, city: str, limit: int) -> pd.DataFrame:
         timeout=25,
     )
     response.raise_for_status()
-    results = response.json().get("results", [])
+    data = response.json()
+    total_count = data.get("count", 0)
+    results = data.get("results", [])
     rows = []
     for raw_job in results:
         normalized = _normalize_live_job_row(raw_job, role=role, city=city)
@@ -498,7 +617,9 @@ def fetch_adzuna_jobs(role: str, city: str, limit: int) -> pd.DataFrame:
             rows.append(normalized)
     if not rows:
         raise RuntimeError("The live API returned jobs, but none contained recognizable skills for the current role.")
-    return pd.DataFrame(rows)
+    df = pd.DataFrame(rows)
+    df.attrs["adzuna_total_count"] = total_count
+    return df
 
 
 def load_jobs() -> pd.DataFrame:
@@ -529,6 +650,15 @@ def _standardize_jobs_df(df: pd.DataFrame) -> pd.DataFrame:
     df["skill_list"] = df["skills"].apply(
         lambda value: [item.strip() for item in str(value).split(";") if item.strip()]
     )
+    if "salary_min" not in df.columns:
+        df["salary_min"] = 0
+    if "salary_max" not in df.columns:
+        df["salary_max"] = 0
+    if "positions" not in df.columns:
+        df["positions"] = 1
+    df["salary_min"] = pd.to_numeric(df["salary_min"], errors="coerce").fillna(0).astype(int)
+    df["salary_max"] = pd.to_numeric(df["salary_max"], errors="coerce").fillna(0).astype(int)
+    df["positions"] = pd.to_numeric(df["positions"], errors="coerce").fillna(1).astype(int)
     return df.dropna(subset=["posted_date"])
 
 
@@ -586,14 +716,7 @@ def get_profile_history(profile_key: str) -> pd.DataFrame:
     history = [item for item in _load_snapshot_history() if item.get("profile_key") == profile_key]
     if not history:
         return pd.DataFrame()
-    df = pd.DataFrame(history).sort_values("date")
-    return df
-
-
-def _dummy_live_fetch(role: str, city: str, limit: int) -> pd.DataFrame:
-    raise RuntimeError(
-        "Live refresh is not configured. Provide a job API, or upload a live CSV, or use curated mode."
-    )
+    return pd.DataFrame(history).sort_values("date")
 
 
 def fetch_live_jobs(role: str, city: str, limit: int) -> pd.DataFrame:
@@ -637,7 +760,10 @@ def analyze_market(df: pd.DataFrame, student_skills: list[str]) -> dict:
     previous_counts = count_skills(previous_rows)
     total_recent = max(len(recent_rows), 1)
     total_previous = max(len(previous_rows), 1)
-    required_skills = [skill for skill, count in recent_counts.most_common(10) if count >= 3]
+    min_count = 2 if len(recent_rows) <= 6 else 3
+    required_skills = [skill for skill, count in recent_counts.most_common(10) if count >= min_count]
+    if not required_skills:
+        required_skills = [skill for skill, _ in recent_counts.most_common(5)]
     matched = sorted([skill for skill in student_skills if skill in required_skills])
     missing = sorted([skill for skill in required_skills if skill not in student_skills])
 
@@ -646,15 +772,13 @@ def analyze_market(df: pd.DataFrame, student_skills: list[str]) -> dict:
         recent_rate = recent_counts[skill] / total_recent
         previous_rate = previous_counts[skill] / total_previous
         delta = recent_rate - previous_rate
-        trend_rows.append(
-            {
-                "skill": skill,
-                "recent_mentions": recent_counts[skill],
-                "previous_mentions": previous_counts[skill],
-                "delta": round(delta, 3),
-                "recent_rate": recent_rate,
-            }
-        )
+        trend_rows.append({
+            "skill": skill,
+            "recent_mentions": recent_counts[skill],
+            "previous_mentions": previous_counts[skill],
+            "delta": round(delta, 3),
+            "recent_rate": recent_rate,
+        })
 
     trend_df = pd.DataFrame(trend_rows).sort_values(by=["delta", "recent_mentions"], ascending=[False, False])
     rising = trend_df[trend_df["delta"] > 0].head(5)
@@ -662,7 +786,8 @@ def analyze_market(df: pd.DataFrame, student_skills: list[str]) -> dict:
     gap_ratio = len(missing) / max(len(required_skills), 1)
     rising_missing = sum(1 for skill in rising["skill"].tolist() if skill in missing)
     trend_bonus = min(rising_missing * 8, 24)
-    score = min(100, round(gap_ratio * 70 + trend_bonus + 10))
+    baseline_penalty = max(0, (len(required_skills) - len(matched)) * 4)
+    score = min(100, round(gap_ratio * 70 + trend_bonus + baseline_penalty + (10 if not student_skills else 5)))
 
     explanations = []
     for _, row in rising.head(3).iterrows():
@@ -670,6 +795,25 @@ def analyze_market(df: pd.DataFrame, student_skills: list[str]) -> dict:
             f"`{row['skill']}` appears in **{int(row['recent_mentions'])}/{total_recent}** recent postings "
             f"vs **{int(row['previous_mentions'])}/{total_previous}** older postings (delta={row['delta']})."
         )
+
+    # --- Month-over-month analysis ---
+    df_sorted = df.copy()
+    df_sorted["month"] = df_sorted["posted_date"].dt.to_period("M")
+    months = sorted(df_sorted["month"].unique())
+    monthly_skill_data: list[dict] = []
+    for month in months:
+        month_rows = df_sorted[df_sorted["month"] == month]
+        month_counts = count_skills(month_rows)
+        for skill, cnt in month_counts.items():
+            monthly_skill_data.append({"month": str(month), "skill": skill, "mentions": cnt})
+    monthly_df = pd.DataFrame(monthly_skill_data) if monthly_skill_data else pd.DataFrame(columns=["month", "skill", "mentions"])
+
+    # New skills this month vs last month
+    new_this_month: list[str] = []
+    if len(months) >= 2:
+        current_month_skills = set(count_skills(df_sorted[df_sorted["month"] == months[-1]]).keys())
+        prev_month_skills = set(count_skills(df_sorted[df_sorted["month"] == months[-2]]).keys())
+        new_this_month = sorted(current_month_skills - prev_month_skills)
 
     return {
         "recent_rows": recent_rows,
@@ -683,6 +827,8 @@ def analyze_market(df: pd.DataFrame, student_skills: list[str]) -> dict:
         "recent_cutoff": recent_cutoff,
         "explanations": explanations,
         "trend_df": trend_df,
+        "monthly_df": monthly_df,
+        "new_this_month": new_this_month,
     }
 
 
@@ -781,22 +927,18 @@ def generate_micro_curriculum(missing: list[str]) -> list[dict[str, object]]:
                 f"Package the result into a visible proof-of-skill artifact.",
             ],
         )
-        curriculum.append(
-            {
-                "skill": skill,
-                "lessons": lessons,
-                "resources": resources[:2],
-            }
-        )
+        curriculum.append({"skill": skill, "lessons": lessons, "resources": resources[:2]})
     return curriculum
 
 
-def generate_gemini_curriculum(missing: list[str], role: str, city: str, student_skills: list[str]) -> tuple[str | None, str | None]:
+@st.cache_data(show_spinner="Generating Gemini curriculum...", ttl=3600)
+def generate_gemini_curriculum(missing_key: str, role: str, city: str, skills_key: str) -> tuple[str | None, str | None]:
     api_key = get_secret("GEMINI_API_KEY")
     if not api_key:
         return None, "Gemini key not detected."
     model_name = get_secret("GEMINI_MODEL", "gemini-2.5-flash")
-    focus_skills = missing[:3] if missing else ["Power BI", "SQL", "Prompt Engineering"]
+    focus_skills = missing_key.split(",") if missing_key else ["Power BI", "SQL", "Prompt Engineering"]
+    student_skills = skills_key.split(",") if skills_key else []
     prompt = f"""
 You are helping generate a concise, practical micro-curriculum for an early-career candidate.
 
@@ -817,15 +959,7 @@ Keep it realistic, concise, and suitable for a student project demo.
         f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent",
         params={"key": api_key},
         headers={"Content-Type": "application/json"},
-        json={
-            "contents": [
-                {
-                    "parts": [
-                        {"text": prompt}
-                    ]
-                }
-            ]
-        },
+        json={"contents": [{"parts": [{"text": prompt}]}]},
         timeout=30,
     )
     if not response.ok:
@@ -849,6 +983,14 @@ def score_label(score: int) -> str:
         return "Medium risk"
     return "Low risk"
 
+
+def format_salary_lpa(amount: int) -> str:
+    if amount <= 0:
+        return "N/A"
+    return f"{amount / 100000:.1f} LPA"
+
+
+# ---- Charts ----
 
 def build_radar_chart(student_skills: list[str], required_skills: list[str]) -> go.Figure:
     categories, student_vals, market_vals = [], [], []
@@ -878,6 +1020,19 @@ def build_trend_chart(analysis: dict) -> go.Figure:
     return fig
 
 
+def build_monthly_trend_chart(monthly_df: pd.DataFrame, top_n: int = 8) -> go.Figure:
+    fig = go.Figure()
+    if monthly_df.empty:
+        return fig
+    top_skills = monthly_df.groupby("skill")["mentions"].sum().nlargest(top_n).index.tolist()
+    filtered = monthly_df[monthly_df["skill"].isin(top_skills)]
+    for skill in top_skills:
+        skill_data = filtered[filtered["skill"] == skill].sort_values("month")
+        fig.add_trace(go.Scatter(x=skill_data["month"], y=skill_data["mentions"], mode="lines+markers", name=skill))
+    fig.update_layout(height=400, margin=dict(l=10, r=10, t=30, b=10), xaxis_title="Month", yaxis_title="Mentions", legend=dict(orientation="h", yanchor="bottom", y=1.02))
+    return fig
+
+
 def build_skill_gap_chart(matched: list[str], missing: list[str]) -> go.Figure:
     skills = matched + missing
     if not skills:
@@ -892,8 +1047,7 @@ def build_skill_gap_chart(matched: list[str], missing: list[str]) -> go.Figure:
 def build_resume_gauge(score: int) -> go.Figure:
     color = "#28a745" if score >= 70 else "#ffc107" if score >= 40 else "#dc3545"
     fig = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=score,
+        mode="gauge+number", value=score,
         title={"text": "Resume Compatibility", "font": {"size": 16}},
         number={"suffix": "%", "font": {"size": 34}},
         gauge={
@@ -935,6 +1089,63 @@ def build_history_chart(history_df: pd.DataFrame) -> go.Figure:
     return fig
 
 
+def build_salary_chart(filtered_jobs: pd.DataFrame) -> go.Figure:
+    salary_jobs = filtered_jobs[(filtered_jobs["salary_min"] > 0) & (filtered_jobs["salary_max"] > 0)].copy()
+    if salary_jobs.empty:
+        return go.Figure()
+    salary_jobs["salary_avg"] = (salary_jobs["salary_min"] + salary_jobs["salary_max"]) / 2
+    by_company = salary_jobs.groupby("company").agg(
+        avg_min=("salary_min", "mean"), avg_max=("salary_max", "mean")
+    ).reset_index().sort_values("avg_max", ascending=True)
+    fig = go.Figure()
+    fig.add_trace(go.Bar(y=by_company["company"], x=by_company["avg_min"] / 100000, name="Min (LPA)", orientation="h", marker_color="#94a3b8"))
+    fig.add_trace(go.Bar(y=by_company["company"], x=by_company["avg_max"] / 100000, name="Max (LPA)", orientation="h", marker_color="#667eea"))
+    fig.update_layout(barmode="group", height=max(250, len(by_company) * 40), margin=dict(l=10, r=10, t=30, b=10), xaxis_title="Salary (LPA)")
+    return fig
+
+
+def build_salary_city_chart(jobs_df: pd.DataFrame, role: str) -> go.Figure:
+    role_jobs = jobs_df[(jobs_df["role"] == role) & (jobs_df["salary_min"] > 0) & (jobs_df["salary_max"] > 0)].copy()
+    if role_jobs.empty:
+        return go.Figure()
+    by_city = role_jobs.groupby("city").agg(
+        avg_min=("salary_min", "mean"), avg_max=("salary_max", "mean")
+    ).reset_index().sort_values("avg_max", ascending=True)
+    fig = go.Figure()
+    fig.add_trace(go.Bar(y=by_city["city"], x=by_city["avg_min"] / 100000, name="Avg Min (LPA)", orientation="h", marker_color="#ffc107"))
+    fig.add_trace(go.Bar(y=by_city["city"], x=by_city["avg_max"] / 100000, name="Avg Max (LPA)", orientation="h", marker_color="#28a745"))
+    fig.update_layout(barmode="group", height=max(200, len(by_city) * 50), margin=dict(l=10, r=10, t=30, b=10), xaxis_title="Salary (LPA)")
+    return fig
+
+
+def build_openings_chart(jobs_df: pd.DataFrame, role: str) -> go.Figure:
+    role_jobs = jobs_df[jobs_df["role"] == role].copy()
+    if role_jobs.empty:
+        return go.Figure()
+    by_city = role_jobs.groupby("city")["positions"].sum().reset_index().sort_values("positions", ascending=True)
+    fig = go.Figure(go.Bar(y=by_city["city"], x=by_city["positions"], orientation="h", marker_color="#667eea", text=by_city["positions"], textposition="outside"))
+    fig.update_layout(height=max(200, len(by_city) * 50), margin=dict(l=10, r=10, t=30, b=10), xaxis_title="Total Positions")
+    return fig
+
+
+def build_benchmark_radar(student_skills: list[str], benchmark_skills: list[str]) -> go.Figure:
+    categories, student_vals, bench_vals = [], [], []
+    for category, category_skills in SKILL_CATEGORIES.items():
+        student_count = sum(1 for skill in category_skills if skill in student_skills)
+        bench_count = sum(1 for skill in category_skills if skill in benchmark_skills)
+        total = max(len(category_skills), 1)
+        categories.append(category)
+        student_vals.append(round(student_count / total * 100))
+        bench_vals.append(round(bench_count / total * 100))
+    fig = go.Figure()
+    fig.add_trace(go.Scatterpolar(r=student_vals + [student_vals[0]], theta=categories + [categories[0]], fill="toself", name="Your Profile", fillcolor="rgba(102, 126, 234, 0.15)", line=dict(color="#667eea", width=2)))
+    fig.add_trace(go.Scatterpolar(r=bench_vals + [bench_vals[0]], theta=categories + [categories[0]], fill="toself", name="Placed Professional", fillcolor="rgba(40, 167, 69, 0.10)", line=dict(color="#28a745", width=2, dash="dash")))
+    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), showlegend=True, height=400, margin=dict(l=60, r=60, t=40, b=40))
+    return fig
+
+
+# ---- PDF Report ----
+
 def _pdf_safe(text: str) -> str:
     text = re.sub(r"[`*]", "", text)
     text = text.replace("\u0394", "delta").replace("\u2014", "-").replace("\u2013", "-")
@@ -942,7 +1153,7 @@ def _pdf_safe(text: str) -> str:
     return text.encode("latin-1", errors="replace").decode("latin-1")
 
 
-def generate_pdf_report(role: str, city: str, filtered_jobs: pd.DataFrame, analysis: dict, roadmap: list[dict[str, str]], proof_pack: dict[str, str], compatibility_data: dict[str, int], student_skills: list[str]) -> bytes | None:
+def generate_pdf_report(role: str, city: str, filtered_jobs: pd.DataFrame, analysis: dict, roadmap: list[dict[str, str]], proof_pack: dict[str, str], compatibility_data: dict[str, int], student_skills: list[str], salary_summary: dict) -> bytes | None:
     if FPDF is None:
         return None
     pdf = FPDF()
@@ -967,6 +1178,9 @@ def generate_pdf_report(role: str, city: str, filtered_jobs: pd.DataFrame, analy
     pdf.cell(w=0, h=7, text=f"Skill Decay Risk: {analysis['score']}/100 ({score_label(analysis['score'])})", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(w=0, h=7, text=f"Resume Compatibility: {compatibility_data['overall']}%", new_x="LMARGIN", new_y="NEXT")
     pdf.ln(3)
+    heading("Salary Insights")
+    write_block(f"Average Range: {salary_summary['avg_min']} - {salary_summary['avg_max']}")
+    write_block(f"Total Positions: {salary_summary['total_positions']}")
     heading("Matched Skills")
     write_block(", ".join(analysis["matched"]) if analysis["matched"] else "None")
     heading("Missing High-Demand Skills")
@@ -991,11 +1205,13 @@ def generate_pdf_report(role: str, city: str, filtered_jobs: pd.DataFrame, analy
 
 def display_skill_tags_html(skills: list[str], css_class: str, empty_text: str) -> None:
     if skills:
-        tags = "".join(f'<span class="skill-tag {css_class}">{skill}</span>' for skill in skills)
+        tags = "".join(f'<span class="skill-tag {css_class}">{html.escape(skill)}</span>' for skill in skills)
         st.markdown(tags, unsafe_allow_html=True)
     else:
         st.caption(empty_text)
 
+
+# ---- Main ----
 
 def main() -> None:
     st.set_page_config(page_title="SkillPulse", page_icon="SP", layout="wide")
@@ -1023,43 +1239,60 @@ def main() -> None:
                 uploaded_resume_text = ""
         st.divider()
         st.subheader("Student Profile")
-        profile_choice = st.radio(
-            "Profile source",
-            options=[
-                "Uploaded Resume" if resume_upload else "Upload a resume above",
-                "Fresh profile",
-                "Sample (Strong match)",
-                "Sample (Weak match)",
-                "Resume (Visshva - AIML/Data)",
-                "Resume (Visshva - SDE/Full-stack)",
-                "Custom paste",
-            ],
-            index=1,
-        )
-        if "Uploaded Resume" in profile_choice and uploaded_resume_text:
-            profile_text = uploaded_resume_text
-        elif profile_choice == "Fresh profile":
-            profile_text = ""
-        elif profile_choice == "Sample (Strong match)":
-            profile_text = SAMPLE_RESUME_PATH.read_text(encoding="utf-8")
-        elif profile_choice == "Sample (Weak match)":
-            profile_text = SAMPLE_RESUME_ALT_PATH.read_text(encoding="utf-8")
-        elif profile_choice == "Resume (Visshva - AIML/Data)":
-            profile_text = RESUME_VISSHVA_AIML_PATH.read_text(encoding="utf-8")
-        elif profile_choice == "Resume (Visshva - SDE/Full-stack)":
-            profile_text = RESUME_VISSHVA_SDE_PATH.read_text(encoding="utf-8")
-        else:
-            profile_text = ""
-        profile_text = st.text_area(
-            "Edit or paste profile text",
-            value=profile_text,
-            height=220,
-            placeholder="Paste a fresh resume summary, skills, projects, or achievements here...",
-        )
-        portfolio_source = st.text_input(
-            "GitHub / portfolio URL or notes (optional)",
-            placeholder="https://github.com/username or brief portfolio notes",
-        )
+        st.caption("Use Apply profile to avoid rerunning Gemini and GitHub analysis on every sidebar change.")
+        if "applied_profile_text" not in st.session_state:
+            st.session_state.applied_profile_text = ""
+        if "applied_portfolio_source" not in st.session_state:
+            st.session_state.applied_portfolio_source = ""
+        if "applied_profile_label" not in st.session_state:
+            st.session_state.applied_profile_label = "Fresh profile"
+        with st.form("profile_input_form"):
+            profile_choice = st.radio(
+                "Profile source",
+                options=[
+                    "Uploaded Resume" if resume_upload else "Upload a resume above",
+                    "Fresh profile",
+                    "Sample (Strong match)",
+                    "Sample (Weak match)",
+                    "Resume (AIML/Data)",
+                    "Resume (SDE/Full-stack)",
+                    "Custom paste",
+                ],
+                index=1,
+            )
+            if "Uploaded Resume" in profile_choice and uploaded_resume_text:
+                profile_text = uploaded_resume_text
+            elif profile_choice == "Fresh profile":
+                profile_text = ""
+            elif profile_choice == "Sample (Strong match)":
+                profile_text = SAMPLE_RESUME_PATH.read_text(encoding="utf-8")
+            elif profile_choice == "Sample (Weak match)":
+                profile_text = SAMPLE_RESUME_ALT_PATH.read_text(encoding="utf-8")
+            elif profile_choice == "Resume (AIML/Data)":
+                profile_text = RESUME_VISSHVA_AIML_PATH.read_text(encoding="utf-8")
+            elif profile_choice == "Resume (SDE/Full-stack)":
+                profile_text = RESUME_VISSHVA_SDE_PATH.read_text(encoding="utf-8")
+            else:
+                profile_text = st.session_state.applied_profile_text if profile_choice == st.session_state.applied_profile_label else ""
+            profile_text = st.text_area(
+                "Edit or paste profile text",
+                value=profile_text,
+                height=220,
+                placeholder="Paste a fresh resume summary, skills, projects, or achievements here...",
+            )
+            portfolio_source = st.text_input(
+                "GitHub / portfolio URL or notes (optional)",
+                value=st.session_state.applied_portfolio_source,
+                placeholder="https://github.com/username or brief portfolio notes",
+            )
+            apply_profile = st.form_submit_button("Apply profile")
+        if apply_profile:
+            st.session_state.applied_profile_text = profile_text
+            st.session_state.applied_portfolio_source = portfolio_source
+            st.session_state.applied_profile_label = profile_choice
+        profile_text = st.session_state.applied_profile_text
+        portfolio_source = st.session_state.applied_portfolio_source
+        profile_choice = st.session_state.applied_profile_label
         github_username = parse_github_username(portfolio_source)
         github_data = {"username": "", "skills": [], "summary": "", "repos": []}
         if github_username:
@@ -1071,6 +1304,8 @@ def main() -> None:
                     st.caption("GitHub-detected skills: " + ", ".join(github_data["skills"][:8]))
             except Exception as error:
                 st.warning(f"GitHub analysis unavailable: {error}")
+        elif profile_choice == "Fresh profile" and not profile_text.strip():
+            st.info("Paste or upload a profile, then click Apply profile.")
         st.divider()
         st.subheader("Data Source")
         uploaded_csv = st.file_uploader("Upload a live jobs CSV (optional)", type=["csv"])
@@ -1116,33 +1351,60 @@ def main() -> None:
     compatibility_data = compute_resume_compatibility(student_skills, analysis["required_skills"], profile_context, role)
     market_alert = build_market_alert(analysis, student_skills, role, portfolio_source.strip())
     micro_curriculum = generate_micro_curriculum(analysis["missing"])
+
+    # Gemini with caching (convert lists to hashable strings)
+    missing_key = ",".join(analysis["missing"][:3]) if analysis["missing"] else ""
+    skills_key = ",".join(student_skills)
     gemini_curriculum = None
     gemini_status = "Gemini not checked yet."
     try:
-        gemini_curriculum, gemini_error = generate_gemini_curriculum(analysis["missing"], role, city, student_skills)
+        gemini_curriculum, gemini_error = generate_gemini_curriculum(missing_key, role, city, skills_key)
         gemini_status = "Gemini live generation enabled." if gemini_curriculum else (gemini_error or "Gemini did not return content.")
     except Exception as error:
         gemini_curriculum = None
         gemini_status = f"Gemini request failed: {error}"
+
     profile_key = build_profile_key(profile_context, role, city, github_data.get("username", ""))
     record_snapshot(profile_key, role, city, analysis, compatibility_data, student_skills)
     history_df = get_profile_history(profile_key)
 
-    metrics = st.columns(4)
-    metrics[0].metric("Job Postings Analyzed", len(filtered_jobs))
-    metrics[1].metric("Skills Detected", len(student_skills))
-    metrics[2].metric("Market Matches", len(analysis["matched"]))
-    metrics[3].metric("Skill Decay Risk", f"{analysis['score']}/100", score_label(analysis["score"]))
+    # Salary summary
+    salary_jobs = filtered_jobs[(filtered_jobs["salary_min"] > 0) & (filtered_jobs["salary_max"] > 0)]
+    if not salary_jobs.empty:
+        sal_avg_min = int(salary_jobs["salary_min"].mean())
+        sal_avg_max = int(salary_jobs["salary_max"].mean())
+        sal_overall_min = int(salary_jobs["salary_min"].min())
+        sal_overall_max = int(salary_jobs["salary_max"].max())
+    else:
+        sal_avg_min = sal_avg_max = sal_overall_min = sal_overall_max = 0
+    total_positions = int(filtered_jobs["positions"].sum())
+    salary_summary = {
+        "avg_min": format_salary_lpa(sal_avg_min),
+        "avg_max": format_salary_lpa(sal_avg_max),
+        "overall_min": format_salary_lpa(sal_overall_min),
+        "overall_max": format_salary_lpa(sal_overall_max),
+        "total_positions": total_positions,
+    }
+
+    # Top metrics row
+    metrics = st.columns(5)
+    metrics[0].metric("Job Postings", len(filtered_jobs))
+    metrics[1].metric("Total Positions", total_positions)
+    metrics[2].metric("Skills Detected", len(student_skills))
+    metrics[3].metric("Market Matches", len(analysis["matched"]))
+    metrics[4].metric("Decay Risk", f"{analysis['score']}/100", score_label(analysis["score"]))
     st.caption(f"Trend window: recent postings since **{analysis['recent_cutoff'].date()}** vs older postings.")
 
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
         "Dashboard",
         "Market Trends",
+        "Salary & Openings",
         "Resume Compatibility",
         "Roadmap & Proof Pack",
         "Micro-Curriculum",
-        "Learning Resources",
+        "Learning & Hackathons",
         "Career Paths",
+        "Profile Benchmark",
     ])
 
     with tab1:
@@ -1180,7 +1442,45 @@ def main() -> None:
             decline_df.columns = ["Skill", "Recent", "Previous", "Trend Delta"]
             st.dataframe(decline_df, use_container_width=True, hide_index=True)
 
+        # Month-over-month
+        st.markdown('<p class="section-header">Month-over-Month Skill Trends</p>', unsafe_allow_html=True)
+        if not analysis["monthly_df"].empty:
+            st.plotly_chart(build_monthly_trend_chart(analysis["monthly_df"]), use_container_width=True)
+        else:
+            st.caption("Not enough monthly data to show trends.")
+        if analysis["new_this_month"]:
+            st.markdown("**New skills appearing this month (not seen last month):**")
+            display_skill_tags_html(analysis["new_this_month"], "skill-rising", "")
+        else:
+            st.caption("No new skills emerged this month compared to last month.")
+
     with tab3:
+        st.markdown('<p class="section-header">Salary Insights</p>', unsafe_allow_html=True)
+        sal_cols = st.columns(4)
+        sal_cols[0].metric("Avg Min Salary", salary_summary["avg_min"])
+        sal_cols[1].metric("Avg Max Salary", salary_summary["avg_max"])
+        sal_cols[2].metric("Lowest Offered", salary_summary["overall_min"])
+        sal_cols[3].metric("Highest Offered", salary_summary["overall_max"])
+
+        sal_left, sal_right = st.columns(2)
+        with sal_left:
+            st.markdown("**Salary by Company**")
+            st.plotly_chart(build_salary_chart(filtered_jobs), use_container_width=True)
+        with sal_right:
+            st.markdown(f"**Salary across Cities for {role}**")
+            st.plotly_chart(build_salary_city_chart(jobs_df, role), use_container_width=True)
+
+        st.markdown('<p class="section-header">Job Openings</p>', unsafe_allow_html=True)
+        open_cols = st.columns(3)
+        open_cols[0].metric(f"Positions in {city}", total_positions)
+        total_role_positions = int(jobs_df[jobs_df["role"] == role]["positions"].sum())
+        open_cols[1].metric(f"Total {role} Positions (All Cities)", total_role_positions)
+        open_cols[2].metric("Unique Companies", filtered_jobs["company"].nunique())
+
+        st.markdown(f"**Openings by City for {role}**")
+        st.plotly_chart(build_openings_chart(jobs_df, role), use_container_width=True)
+
+    with tab4:
         st.markdown('<p class="section-header">Resume Compatibility Analysis</p>', unsafe_allow_html=True)
         compat_left, compat_right = st.columns([1, 1.2])
         with compat_left:
@@ -1199,7 +1499,7 @@ def main() -> None:
                 ("Profile Completeness", "completeness", "Structure, detail, and quantifiable achievements."),
                 ("Role Alignment", "role_alignment", "How well your profile targets this specific role."),
             ]:
-                st.markdown(f"**{label}** — `{compatibility_data[key]}%`")
+                st.markdown(f"**{label}** -- `{compatibility_data[key]}%`")
                 st.progress(compatibility_data[key] / 100)
                 st.caption(caption)
             if github_data["username"]:
@@ -1207,7 +1507,7 @@ def main() -> None:
                 st.caption("Public GitHub repositories and topics are folded into the profile context to make the analysis closer to a portfolio-aware evaluation.")
                 st.write(f"GitHub profile analyzed: `@{github_data['username']}`")
 
-    with tab4:
+    with tab5:
         road_left, road_right = st.columns(2)
         with road_left:
             st.markdown('<p class="section-header">7-Day Micro Roadmap</p>', unsafe_allow_html=True)
@@ -1227,6 +1527,8 @@ def main() -> None:
             f"- Role: {role}",
             f"- City: {city}",
             f"- Job postings analyzed: {len(filtered_jobs)}",
+            f"- Total positions: {total_positions}",
+            f"- Salary range: {salary_summary['avg_min']} - {salary_summary['avg_max']}",
             f"- Skill decay risk: {analysis['score']}/100 ({score_label(analysis['score'])})",
             f"- Resume compatibility: {compatibility_data['overall']}%",
             "",
@@ -1250,7 +1552,7 @@ def main() -> None:
             f"- Role Alignment: {compatibility_data['role_alignment']}%",
             "",
             "## 7-Day Roadmap",
-            "\n".join([f"- **{item['day']}**: {item['focus']} — {item['task']}" for item in roadmap]),
+            "\n".join([f"- **{item['day']}**: {item['focus']} -- {item['task']}" for item in roadmap]),
             "",
             "## Proof Pack",
             f"- Title: {proof_pack['title']}",
@@ -1262,13 +1564,13 @@ def main() -> None:
         with dl_col1:
             st.download_button("Download Report (Markdown)", data=report_md.encode("utf-8"), file_name="skillpulse_report.md", mime="text/markdown")
         with dl_col2:
-            pdf_bytes = generate_pdf_report(role, city, filtered_jobs, analysis, roadmap, proof_pack, compatibility_data, student_skills)
+            pdf_bytes = generate_pdf_report(role, city, filtered_jobs, analysis, roadmap, proof_pack, compatibility_data, student_skills, salary_summary)
             if pdf_bytes:
                 st.download_button("Download Report (PDF)", data=pdf_bytes, file_name="skillpulse_report.pdf", mime="application/pdf")
             else:
                 st.caption("Install `fpdf2` for PDF report downloads.")
 
-    with tab5:
+    with tab6:
         st.markdown('<p class="section-header">Continuous Skill Alert</p>', unsafe_allow_html=True)
         st.warning(market_alert["title"])
         st.write(market_alert["body"])
@@ -1293,7 +1595,7 @@ def main() -> None:
                 if block["resources"]:
                     st.markdown("**Suggested resources**")
                     for resource in block["resources"]:
-                        st.markdown(f"- [{resource['title']}]({resource['url']}) — {resource['type']} ({resource['time']})")
+                        st.markdown(f"- [{resource['title']}]({resource['url']}) -- {resource['type']} ({resource['time']})")
         st.markdown('<p class="section-header">Gemini Vision Layer</p>', unsafe_allow_html=True)
         st.caption(gemini_status)
         if gemini_curriculum:
@@ -1301,7 +1603,7 @@ def main() -> None:
         else:
             st.caption("Gemini-enhanced curriculum is optional. Add `GEMINI_API_KEY` in Streamlit secrets or environment variables to enable live generation.")
 
-    with tab6:
+    with tab7:
         st.markdown('<p class="section-header">Recommended Learning Resources</p>', unsafe_allow_html=True)
         target_skills = analysis["missing"] if analysis["missing"] else list(LEARNING_RESOURCES.keys())[:3]
         for skill in target_skills:
@@ -1309,15 +1611,85 @@ def main() -> None:
             if resources:
                 with st.expander(skill, expanded=skill == target_skills[0]):
                     for resource in resources:
-                        st.markdown(f"**{resource['title']}** — _{resource['type']}_ ({resource['time']})  \n[Open Resource]({resource['url']})")
+                        st.markdown(f"**{resource['title']}** -- _{resource['type']}_ ({resource['time']})  \n[Open Resource]({resource['url']})")
                         st.divider()
             else:
                 with st.expander(skill):
                     st.caption(f"No curated resources yet for {skill}.")
 
-    with tab7:
+        st.markdown('<p class="section-header">Hackathons & Competitions</p>', unsafe_allow_html=True)
+        st.caption("Recommended based on your missing skills and career goals.")
+        hackathon_skills = analysis["missing"] if analysis["missing"] else list(HACKATHON_MAP.keys())[:3]
+        seen_hackathons: set[str] = set()
+        for skill in hackathon_skills:
+            hacks = HACKATHON_MAP.get(skill, [])
+            if hacks:
+                with st.expander(f"Hackathons for {skill}", expanded=skill == hackathon_skills[0]):
+                    for h in hacks:
+                        if h["name"] not in seen_hackathons:
+                            seen_hackathons.add(h["name"])
+                            st.markdown(f"**{h['name']}** -- _{h['platform']}_ ({h['type']})  \n[Visit]({h['url']})")
+                            st.divider()
+        # General hackathon platforms
+        with st.expander("General Hackathon Platforms"):
+            general = [
+                {"name": "Devpost", "url": "https://devpost.com/hackathons", "desc": "Global hackathon directory with prizes"},
+                {"name": "MLH (Major League Hacking)", "url": "https://mlh.io/seasons/2026/events", "desc": "Student-focused seasonal hackathons"},
+                {"name": "Unstop", "url": "https://unstop.com/hackathons", "desc": "India-focused competitions and hackathons"},
+                {"name": "Kaggle", "url": "https://www.kaggle.com/competitions", "desc": "Data science and ML competitions"},
+                {"name": "HackerEarth", "url": "https://www.hackerearth.com/challenges/", "desc": "Coding challenges and hackathons"},
+            ]
+            for g in general:
+                st.markdown(f"**{g['name']}** -- {g['desc']}  \n[Visit]({g['url']})")
+                st.divider()
+
+    with tab8:
         st.markdown('<p class="section-header">Career Path Progression</p>', unsafe_allow_html=True)
         st.plotly_chart(build_career_path_chart(role, student_skills), use_container_width=True)
+
+    with tab9:
+        st.markdown('<p class="section-header">Profile Benchmark: You vs Placed Professional</p>', unsafe_allow_html=True)
+        benchmark = BENCHMARK_PROFILES.get(role)
+        if not benchmark:
+            closest_key = next((k for k in BENCHMARK_PROFILES if k.lower() in role.lower() or role.lower() in k.lower()), None)
+            benchmark = BENCHMARK_PROFILES.get(closest_key) if closest_key else list(BENCHMARK_PROFILES.values())[0]
+
+        st.info(f"**Benchmark:** {benchmark['label']}")
+        st.caption(benchmark["summary"])
+
+        bench_left, bench_right = st.columns([1.2, 0.8])
+        with bench_left:
+            st.plotly_chart(build_benchmark_radar(student_skills, benchmark["skills"]), use_container_width=True)
+        with bench_right:
+            your_set = set(student_skills)
+            bench_set = set(benchmark["skills"])
+            common = sorted(your_set & bench_set)
+            you_only = sorted(your_set - bench_set)
+            they_only = sorted(bench_set - your_set)
+
+            st.markdown("**Skills You Both Have**")
+            display_skill_tags_html(common, "skill-matched", "No overlap yet.")
+
+            st.markdown("**Skills Only You Have**")
+            display_skill_tags_html(you_only, "skill-benchmark", "None -- the benchmark covers all your skills.")
+
+            st.markdown("**Skills the Placed Professional Has (You Don't)**")
+            display_skill_tags_html(they_only, "skill-missing", "You already match the benchmark!")
+
+        if they_only:
+            st.markdown("---")
+            st.markdown("**To match this benchmark, focus on:**")
+            for i, skill in enumerate(they_only[:5], 1):
+                project = PROJECT_MAP.get(skill, f"Build a hands-on project demonstrating {skill}.")
+                st.markdown(f"{i}. **{skill}** -- {project}")
+
+        # Readiness score
+        if benchmark["skills"]:
+            readiness = round(len(common) / len(benchmark["skills"]) * 100)
+            color = "success" if readiness >= 70 else "warning" if readiness >= 40 else "error"
+            getattr(st, color)(f"Benchmark Readiness: **{readiness}%** ({len(common)}/{len(benchmark['skills'])} skills matched)")
+
+    # --- Bottom Expanders ---
 
     with st.expander("Compare Two Profiles"):
         comp_col1, comp_col2 = st.columns(2)
@@ -1354,12 +1726,6 @@ def main() -> None:
         - **Case 1:** a final-year student with `Excel`, `SQL`, and `Python` sees that `Power BI` and `Dashboard Storytelling` are becoming stronger differentiators.
         - **Case 2:** a weakly aligned student with only reporting experience gets a higher risk score and a targeted recovery roadmap.
         - **Case 3:** a placement mentor uses the same role dataset to guide multiple students consistently.
-        """)
-
-    with st.expander("SDG Alignment"):
-        st.markdown("""
-        - **SDG 4 (Quality Education):** guides students to targeted micro-skills and proof-based learning.
-        - **SDG 8 (Decent Work & Economic Growth):** improves employability by aligning skills with real job demand.
         """)
 
     with st.expander("Evidence & Sources"):

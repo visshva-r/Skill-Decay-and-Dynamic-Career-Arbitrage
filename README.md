@@ -23,25 +23,35 @@ SkillPulse compares a learner profile against recent role-specific job data and 
 - rising and declining market signals
 - a skill decay risk score
 - a resume compatibility score
+- salary insights and position openings count
+- month-over-month skill trend analysis
 - a 7-day micro-roadmap
 - a proof pack containing a mini-project idea, resume bullet, and repository description
+- hackathon and competition recommendations
+- profile benchmark against placed professionals
 
 ## Key Capabilities
 
 - Role- and location-specific job signal analysis
-- Resume upload for `PDF`, `DOCX`, or `TXT` files
+- Resume upload for `PDF`, `DOCX`, or `TXT` files (with 10 MB size limit)
 - Skill extraction from profile or resume text
-- Interactive charts for skill coverage, trends, and career paths
+- Interactive charts for skill coverage, trends, salary, and career paths
 - Explainable trend analysis showing why a skill is rising or declining
+- Month-over-month trend comparison with new skill detection
+- Salary insights with company-level and city-level comparisons (LPA)
+- Job openings count per role and city
 - GitHub-aware profile enrichment using public repository signals
+- Profile benchmark comparing your resume against a placed professional's profile
+- Hackathon and competition recommendations based on missing skills
 - Snapshot history to show how compatibility and skill-decay risk change over time
-- Optional Gemini-powered micro-curriculum generation when an API key is configured
-- Optional Adzuna-powered live refresh for real-time job signals
+- Optional Gemini-powered micro-curriculum generation (cached for performance)
+- Optional Adzuna-powered live refresh for real-time job signals with salary extraction
 - Curated learning resources for missing skills
 - Profile comparison mode for side-by-side analysis
 - Hybrid data model with curated data, optional live upload, and cache-ready refresh support
-- Downloadable markdown and PDF reports for sharing or review
+- Downloadable markdown and PDF reports (including salary and positions data)
 - Multiple demo profiles to compare strong and weak role alignment
+- Career path progression for all 6 supported roles
 
 ## Why SkillPulse Stands Out
 
@@ -50,12 +60,15 @@ SkillPulse compares a learner profile against recent role-specific job data and 
 - `Explainability`: shows the evidence behind trend shifts
 - `Reliability`: works offline with curated data while remaining compatible with live updates
 - `Interactivity`: uses visual analytics for a stronger demo and easier interpretation
+- `Benchmarking`: compares your profile against real placed professionals
 
 ## Real-World Use Cases
 
 - A final-year student checks whether their current data analyst profile aligns with fresh hiring demand in Chennai.
 - A placement cell uses recent job signals to advise students on the most valuable next-step skills.
 - A learner converts a missing skill like `Power BI` or `Prompt Engineering` into a focused mini-project and resume-ready evidence.
+- A student compares their resume against a placed professional's profile to identify exact skill gaps.
+- A learner finds relevant hackathons and competitions to build portfolio evidence for missing skills.
 
 ## Example Case Studies
 
@@ -73,29 +86,15 @@ SkillPulse compares a learner profile against recent role-specific job data and 
   - A faculty mentor or placement coordinator reviews multiple student profiles against the same role dataset.
   - SkillPulse provides consistent evidence of market drift and helps prioritize training topics.
 
-## Evidence (Optional)
-
-If you want to cite credible external context during judging or in a report:
-
-- `evidence_notes.md`: summary of the external PDFs and what they support
-- ModernAnalyst (2026) on agentic workflows, governance-in-the-flow, provenance, monitoring, and decision rights
-- Cornerstone on skills graphs and skills taxonomies used to map skills to roles
-- Hays skills reporting on rapid shifts in workforce capability expectations
-
 ## Project Structure
 
 - `app.py`: Streamlit application
-- `data/job_postings.csv`: curated multi-role, multi-city job dataset
+- `data/job_postings.csv`: curated multi-role, multi-city job dataset (with salary and positions data)
 - `data/live_jobs_sample.csv`: upload-ready sample live jobs CSV
 - `data/sample_resume.txt`: sample profile with stronger alignment
 - `data/sample_resume_alt.txt`: sample profile with weaker alignment
-- `data/resume_visshva_aiml_redacted.txt`: your AIML/data resume content (redacted)
-- `data/resume_visshva_sde_redacted.txt`: your SDE/full-stack resume content (redacted)
-- `case_studies.md`: concise real-world scenarios and product relevance
-- `evidence_notes.md`: summary of supporting references and how to cite them honestly
-- `pitch.md`: presentation summary
-- `demo_script.md`: short walkthrough script
-- `LIVE_DATA_SETUP.md`: optional hybrid/live data integration guide
+- `data/resume_visshva_aiml_redacted.txt`: redacted AIML/data resume example
+- `data/resume_visshva_sde_redacted.txt`: redacted SDE/full-stack resume example
 
 ## Run Locally
 
@@ -121,7 +120,3 @@ streamlit run app.py
 
 `SkillPulse translates job-market drift into clear, explainable, and actionable career intelligence for students and early-career professionals.`
 
-## Optional SDG Alignment
-
-- SDG 4 (Quality Education)
-- SDG 8 (Decent Work and Economic Growth)

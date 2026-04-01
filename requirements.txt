@@ -5,3 +5,4 @@ plotly
 pdfplumber
 python-docx
 fpdf2
+python-dotenv
