@@ -233,6 +233,16 @@ CITY_TO_STATE_MAP = {
     "Gurugram": "Haryana",
 }
 
+CITY_ALIAS_MAP = {
+    "bangalore": "Bengaluru",
+    "bengaluru": "Bengaluru",
+    "madras": "Chennai",
+    "chennai": "Chennai",
+    "hyderabad": "Hyderabad",
+    "gurgaon": "Gurugram",
+    "gurugram": "Gurugram",
+}
+
 CAREER_PATHS = {
     "Junior Data Analyst": {
         "current": "Junior Data Analyst",
@@ -500,6 +510,13 @@ def load_jobs() -> pd.DataFrame:
     return df
 
 
+def normalize_city_name(value: object) -> str:
+    text = str(value).strip()
+    if not text:
+        return text
+    return CITY_ALIAS_MAP.get(text.lower(), text)
+
+
 def _standardize_jobs_df(df: pd.DataFrame) -> pd.DataFrame:
     required_cols = {"job_id", "role", "city", "posted_date", "title", "company", "skills"}
     missing = required_cols - set(df.columns)
@@ -507,6 +524,7 @@ def _standardize_jobs_df(df: pd.DataFrame) -> pd.DataFrame:
         raise ValueError(f"Job dataset missing columns: {sorted(missing)}")
     df = df.copy()
     df["posted_date"] = pd.to_datetime(df["posted_date"], errors="coerce")
+    df["city"] = df["city"].apply(normalize_city_name)
     df["skills"] = df["skills"].fillna("")
     df["skill_list"] = df["skills"].apply(
         lambda value: [item.strip() for item in str(value).split(";") if item.strip()]
