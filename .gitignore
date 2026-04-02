@@ -10,6 +10,7 @@ venv/
 env/
 .env
 .env.*
-.streamlit/
+.streamlit/*
+!.streamlit/config.toml
 data/live_cache.csv
 data/profile_snapshots.json
