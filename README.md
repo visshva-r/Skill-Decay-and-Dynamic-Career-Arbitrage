@@ -2,6 +2,8 @@
 
 `SkillPulse` is a market-intelligence and career guidance platform that detects emerging skill decay, identifies role-specific skill gaps, and generates proof-oriented learning roadmaps for early-career talent and placement teams.
 
+**Live demo:** [https://skillpulse-visshva.streamlit.app/](https://skillpulse-visshva.streamlit.app/)
+
 ## Overview
 
 SkillPulse helps learners and placement teams answer:
