@@ -14,3 +14,5 @@ env/
 !.streamlit/config.toml
 data/live_cache.csv
 data/profile_snapshots.json
+pre_push_test_report.md
+pre_push_test_report*.md

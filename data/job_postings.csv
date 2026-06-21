@@ -55,3 +55,35 @@ job_id,role,city,posted_date,title,company,skills,salary_min,salary_max,position
 54,Junior Data Analyst,Pune,2026-03-28,Data Analyst Trainee,InsightSphere,"Excel;SQL;Power BI;Python;Dashboard Storytelling;Statistics",380000,620000,2
 55,Business Analyst,Gurugram,2026-03-26,Business Analyst,FinEdge,"Excel;SQL;Business Analysis;Documentation;Stakeholder Reporting;JIRA",500000,820000,1
 56,AI/ML Intern,Pune,2026-03-25,Applied ML Intern,ModelForge,"Python;Machine Learning;Pandas;Scikit-learn;Prompt Engineering;Git",420000,680000,2
+57,FinTech Analyst,Chennai,2026-03-31,Junior FinTech Analyst,PayGrid,"Excel;SQL;Python;Financial Modeling;Power BI;Risk Analysis",450000,700000,2
+58,FinTech Analyst,Chennai,2026-03-22,Financial Data Analyst,FinEdge,"SQL;Excel;Financial Modeling;Dashboard Storytelling;Regulatory Basics;Python",480000,720000,1
+59,FinTech Analyst,Bengaluru,2026-03-30,FinTech Analyst Associate,CreditNova,"SQL;Python;Power BI;Risk Analysis;Financial Modeling;Stakeholder Reporting",550000,850000,2
+60,FinTech Analyst,Bengaluru,2026-02-18,Payments Analyst,Axis Harbor,"Excel;SQL;Regulatory Basics;Dashboard Storytelling;Data Validation;Communication",420000,650000,1
+61,FinTech Analyst,Hyderabad,2026-03-29,FinTech Operations Analyst,DashMint,"Excel;SQL;Python;Risk Analysis;Power BI;Documentation",430000,680000,2
+62,FinTech Analyst,Hyderabad,2026-02-20,Regulatory Reporting Analyst,ClearMatrix,"Excel;Regulatory Basics;SQL;Financial Modeling;Reporting;Communication",400000,620000,1
+63,FinTech Analyst,Mumbai,2026-03-28,FinTech Analyst,HarborPay,"SQL;Python;Financial Modeling;Power BI;Risk Analysis;Dashboard Storytelling",600000,900000,2
+64,FinTech Analyst,Mumbai,2026-03-15,Investment Operations Analyst,MetroFin,"Excel;SQL;Financial Modeling;Regulatory Basics;Stakeholder Reporting;Python",520000,800000,1
+65,FinTech Analyst,Delhi,2026-03-27,FinTech Business Analyst,NorthLedger,"Excel;SQL;Business Analysis;Financial Modeling;Power BI;Risk Analysis",500000,780000,2
+66,FinTech Analyst,Delhi,2026-02-16,Payments Risk Analyst,CapitalSpring,"SQL;Python;Risk Analysis;Regulatory Basics;Data Validation;Dashboard Storytelling",480000,750000,1
+67,Healthcare Data Analyst,Chennai,2026-03-31,Healthcare Data Analyst,MedNova,"Excel;SQL;Python;Healthcare KPIs;Power BI;Clinical Data",420000,680000,2
+68,Healthcare Data Analyst,Chennai,2026-03-20,Clinical Reporting Analyst,CareGrid,"SQL;Excel;Healthcare KPIs;Data Validation;Dashboard Storytelling;Documentation",400000,620000,1
+69,Healthcare Data Analyst,Bengaluru,2026-03-30,Health Informatics Analyst,VitalStack,"SQL;Python;Power BI;Clinical Data;Healthcare KPIs;Statistics",500000,780000,2
+70,Healthcare Data Analyst,Bengaluru,2026-02-19,Healthcare BI Associate,WellMetrics,"Excel;Power BI;Healthcare KPIs;SQL;Dashboard Storytelling;Communication",450000,700000,1
+71,Healthcare Data Analyst,Hyderabad,2026-03-29,Healthcare Operations Analyst,LifeBridge,"Excel;SQL;Healthcare KPIs;Clinical Data;Data Validation;Reporting",430000,670000,2
+72,Healthcare Data Analyst,Hyderabad,2026-02-17,Patient Analytics Associate,HealthSpring,"Python;SQL;Healthcare KPIs;Power BI;Statistics;Documentation",410000,640000,1
+73,Healthcare Data Analyst,Mumbai,2026-03-28,Healthcare Data Analyst,MetroCare,"SQL;Python;Power BI;Clinical Data;Healthcare KPIs;Dashboard Storytelling",520000,820000,2
+74,Healthcare Data Analyst,Mumbai,2026-03-14,Hospital KPI Analyst,CareNova,"Excel;SQL;Healthcare KPIs;Data Validation;Power BI;Stakeholder Reporting",480000,760000,1
+75,Healthcare Data Analyst,Delhi,2026-03-26,Health Data Associate,CapitalHealth,"Excel;SQL;Python;Clinical Data;Healthcare KPIs;Data Validation",460000,720000,2
+76,Healthcare Data Analyst,Delhi,2026-02-15,Healthcare Reporting Analyst,NorthCare,"SQL;Excel;Power BI;Healthcare KPIs;Dashboard Storytelling;Communication",440000,690000,1
+77,Junior Data Analyst,Mumbai,2026-03-30,Data Analyst Associate,MetroIQ,"Excel;SQL;Power BI;Python;Dashboard Storytelling;Statistics",420000,680000,2
+78,Junior Data Analyst,Delhi,2026-03-27,Junior BI Analyst,CapitalReach,"SQL;Excel;Power BI;Python;Data Cleaning;Communication",400000,650000,1
+79,Frontend Developer,Mumbai,2026-03-29,Frontend Engineer,WebHarbor,"React.js;TypeScript;Next.js;Tailwind CSS;REST APIs;Git",650000,1000000,2
+80,Frontend Developer,Delhi,2026-03-24,UI Developer,NorthApps,"React.js;TypeScript;JavaScript;Tailwind CSS;REST APIs;Figma",580000,900000,1
+81,Business Analyst,Mumbai,2026-03-28,Business Analyst,MetroConsult,"Excel;SQL;Business Analysis;Power BI;Stakeholder Reporting;Communication",520000,820000,2
+82,Business Analyst,Delhi,2026-03-22,BA Associate,CapitalBridge,"Excel;Business Analysis;SQL;Documentation;Dashboard Storytelling;JIRA",500000,780000,1
+83,AI/ML Intern,Mumbai,2026-03-26,Applied AI Intern,ModelHarbor,"Python;Machine Learning;Prompt Engineering;Pandas;SQL;Git",450000,700000,2
+84,AI/ML Intern,Delhi,2026-03-20,ML Intern,NorthAI,"Python;Scikit-learn;NLP;Pandas;NumPy;Docker",430000,680000,1
+85,Data Science Intern,Mumbai,2026-03-25,Data Science Intern,MetroLabs,"Python;Machine Learning;SQL;Pandas;Statistics;Power BI",480000,750000,2
+86,Data Science Intern,Delhi,2026-03-18,Analytics Intern,CapitalData,"Python;Pandas;SQL;EDA;Data Visualization;Statistics",450000,700000,1
+87,SDE / Full-stack Developer,Mumbai,2026-03-29,Full Stack Developer,HarborCode,"TypeScript;React.js;Node.js;PostgreSQL;Docker;REST APIs",750000,1250000,2
+88,SDE / Full-stack Developer,Delhi,2026-03-21,Software Engineer,NorthStack,"JavaScript;React.js;Node.js;MongoDB;Docker;CI/CD",700000,1150000,1

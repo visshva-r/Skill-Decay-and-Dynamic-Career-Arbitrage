@@ -1,0 +1,21 @@
+Priya Nair
+Final Year B.Sc Statistics
+Chennai
+
+Profile
+Aspiring data analyst with coursework in statistics, Excel dashboards, and introductory Python. Completed one internship project on sales reporting.
+
+Skills
+- Excel
+- SQL
+- Python
+- Statistics
+- Data Visualization
+- Communication
+
+Projects
+- Retail sales summary dashboard using Excel and basic SQL queries
+- Classroom survey analysis with Python pandas
+
+Goal
+Seeking junior data analyst or business analyst roles in Chennai or Bengaluru.

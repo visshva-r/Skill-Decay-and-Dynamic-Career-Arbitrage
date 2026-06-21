@@ -39,6 +39,7 @@ SAMPLE_RESUME_PATH = Path("data/sample_resume.txt")
 SAMPLE_RESUME_ALT_PATH = Path("data/sample_resume_alt.txt")
 RESUME_VISSHVA_AIML_PATH = Path("data/resume_visshva_aiml_redacted.txt")
 RESUME_VISSHVA_SDE_PATH = Path("data/resume_visshva_sde_redacted.txt")
+SAMPLE_BATCH_STUDENT_3_PATH = Path("data/sample_batch_student_3.txt")
 LIVE_CACHE_PATH = Path("data/live_cache.csv")
 SNAPSHOT_HISTORY_PATH = Path("data/profile_snapshots.json")
 
@@ -60,6 +61,8 @@ SKILL_CATALOG = [
     "Machine Learning", "Deep Learning", "TensorFlow", "PyTorch",
     "NLP", "Computer Vision", "AWS", "Azure", "GCP", "Kubernetes",
     "CI/CD", "Agile", "Scrum", "JIRA", "Figma", "R",
+    "Financial Modeling", "Risk Analysis", "Regulatory Basics",
+    "Healthcare KPIs", "Clinical Data",
 ]
 
 SKILL_ALIAS = {
@@ -96,6 +99,11 @@ PROJECT_MAP = {
     "Node.js": "Create a RESTful backend with authentication, middleware, and database integration.",
     "Excel": "Build an advanced Excel workbook with pivot tables, lookup chains, and automated summary dashboards.",
     "Tableau": "Design an interactive Tableau dashboard with calculated fields, parameters, and storytelling.",
+    "Financial Modeling": "Build a three-statement financial model for a startup scenario with assumptions, scenarios, and sensitivity tables.",
+    "Risk Analysis": "Create a portfolio risk dashboard with exposure metrics, trend alerts, and documented mitigation recommendations.",
+    "Regulatory Basics": "Map a fintech workflow to key compliance checkpoints and produce a one-page regulatory readiness summary.",
+    "Healthcare KPIs": "Design a hospital operations KPI dashboard covering occupancy, wait times, and readmission indicators.",
+    "Clinical Data": "Clean and validate a de-identified clinical dataset with documented quality checks and summary statistics.",
 }
 
 SKILL_CATEGORIES = {
@@ -213,6 +221,8 @@ ROLE_QUERY_MAP = {
     "Business Analyst": "business analyst",
     "Data Science Intern": "data science intern",
     "SDE / Full-stack Developer": "full stack developer",
+    "FinTech Analyst": "fintech analyst",
+    "Healthcare Data Analyst": "healthcare data analyst",
 }
 
 CITY_TO_STATE_MAP = {
@@ -221,6 +231,8 @@ CITY_TO_STATE_MAP = {
     "Hyderabad": "Telangana",
     "Pune": "Maharashtra",
     "Gurugram": "Haryana",
+    "Mumbai": "Maharashtra",
+    "Delhi": "Delhi",
 }
 
 CITY_ALIAS_MAP = {
@@ -228,6 +240,8 @@ CITY_ALIAS_MAP = {
     "madras": "Chennai", "chennai": "Chennai",
     "hyderabad": "Hyderabad",
     "gurgaon": "Gurugram", "gurugram": "Gurugram",
+    "mumbai": "Mumbai", "bombay": "Mumbai",
+    "delhi": "Delhi", "new delhi": "Delhi",
 }
 
 CAREER_PATHS = {
@@ -283,6 +297,24 @@ CAREER_PATHS = {
             {"role": "ML Engineer", "years": "2-3 yrs", "key_skills": ["Python", "PyTorch", "Docker", "REST APIs"]},
             {"role": "Analytics Engineer", "years": "2-4 yrs", "key_skills": ["SQL", "Python", "ETL Basics", "Power BI"]},
             {"role": "AI Product Specialist", "years": "3-5 yrs", "key_skills": ["Machine Learning", "Prompt Engineering", "Communication", "Agile"]},
+        ],
+    },
+    "FinTech Analyst": {
+        "current": "FinTech Analyst",
+        "paths": [
+            {"role": "Senior FinTech Analyst", "years": "2-3 yrs", "key_skills": ["Financial Modeling", "SQL", "Power BI", "Risk Analysis"]},
+            {"role": "Risk Analyst", "years": "2-4 yrs", "key_skills": ["Risk Analysis", "Python", "Regulatory Basics", "Excel"]},
+            {"role": "Product Analyst (FinTech)", "years": "3-5 yrs", "key_skills": ["Business Analysis", "SQL", "Dashboard Storytelling", "Stakeholder Reporting"]},
+            {"role": "Compliance Analytics Lead", "years": "4-6 yrs", "key_skills": ["Regulatory Basics", "Documentation", "KPI Tracking", "Communication"]},
+        ],
+    },
+    "Healthcare Data Analyst": {
+        "current": "Healthcare Data Analyst",
+        "paths": [
+            {"role": "Senior Healthcare Analyst", "years": "2-3 yrs", "key_skills": ["Healthcare KPIs", "SQL", "Power BI", "Clinical Data"]},
+            {"role": "Health Informatics Specialist", "years": "2-4 yrs", "key_skills": ["Clinical Data", "Data Validation", "Python", "Dashboard Storytelling"]},
+            {"role": "Healthcare BI Lead", "years": "3-5 yrs", "key_skills": ["Power BI", "SQL", "Stakeholder Reporting", "KPI Tracking"]},
+            {"role": "Population Health Analyst", "years": "4-6 yrs", "key_skills": ["Statistics", "Python", "Healthcare KPIs", "Data Visualization"]},
         ],
     },
 }
@@ -390,6 +422,20 @@ BENCHMARK_PROFILES = {
                    "Next.js", "PostgreSQL", "MongoDB", "Docker", "REST APIs",
                    "Git", "CI/CD", "Agile"],
         "summary": "Placed at a SaaS startup in Bengaluru. Shipped 3 full-stack features end-to-end. Strong backend + DevOps awareness.",
+    },
+    "FinTech Analyst": {
+        "label": "Placed FinTech Analyst (1 yr exp)",
+        "skills": ["Excel", "SQL", "Python", "Financial Modeling", "Power BI",
+                   "Risk Analysis", "Regulatory Basics", "Dashboard Storytelling",
+                   "Data Validation", "Stakeholder Reporting", "Communication"],
+        "summary": "Placed at a payments startup in Mumbai. Built risk dashboards and regulatory reporting packs for operations teams.",
+    },
+    "Healthcare Data Analyst": {
+        "label": "Placed Healthcare Data Analyst (1 yr exp)",
+        "skills": ["Excel", "SQL", "Python", "Power BI", "Healthcare KPIs",
+                   "Clinical Data", "Data Validation", "Dashboard Storytelling",
+                   "Statistics", "Documentation", "Communication"],
+        "summary": "Placed at a health-tech firm in Bengaluru. Delivered clinical KPI dashboards and validated patient-flow reporting datasets.",
     },
 }
 
@@ -1036,6 +1082,38 @@ def show_gemini_setup_hint(gemini_status: str) -> bool:
     return "key not detected" in lowered or "api key" in lowered
 
 
+def resolve_gemini_curriculum(
+    missing_key: str,
+    role: str,
+    city: str,
+    skills_key: str,
+    request_generation: bool,
+) -> tuple[str | None, str]:
+    cache_key = f"{missing_key}|{role}|{city}|{skills_key}"
+    if "gemini_cache_key" not in st.session_state:
+        st.session_state.gemini_cache_key = ""
+        st.session_state.gemini_curriculum = None
+        st.session_state.gemini_status = "Click **Generate with Gemini** to create an optional AI-enhanced curriculum."
+
+    if request_generation:
+        try:
+            curriculum, error = generate_gemini_curriculum(missing_key, role, city, skills_key)
+            st.session_state.gemini_cache_key = cache_key
+            st.session_state.gemini_curriculum = curriculum
+            st.session_state.gemini_status = (
+                "Gemini live generation enabled." if curriculum else (error or "Gemini did not return content.")
+            )
+        except Exception as error:
+            st.session_state.gemini_curriculum = None
+            st.session_state.gemini_status = f"Gemini request failed: {error}"
+    elif st.session_state.gemini_cache_key != cache_key:
+        st.session_state.gemini_cache_key = cache_key
+        st.session_state.gemini_curriculum = None
+        st.session_state.gemini_status = "Click **Generate with Gemini** to create an optional AI-enhanced curriculum."
+
+    return st.session_state.gemini_curriculum, st.session_state.gemini_status
+
+
 def format_salary_lpa(amount: int) -> str:
     if amount <= 0:
         return "N/A"
@@ -1263,6 +1341,322 @@ def display_skill_tags_html(skills: list[str], css_class: str, empty_text: str) 
         st.caption(empty_text)
 
 
+# ---- Placement Cell / Batch Analysis ----
+
+def load_demo_batch_profiles() -> list[tuple[str, str]]:
+    return [
+        ("Riya Sharma (Strong)", SAMPLE_RESUME_PATH.read_text(encoding="utf-8")),
+        ("Arjun Kumar (Weak)", SAMPLE_RESUME_ALT_PATH.read_text(encoding="utf-8")),
+        ("Priya Nair (Moderate)", SAMPLE_BATCH_STUDENT_3_PATH.read_text(encoding="utf-8")),
+    ]
+
+
+def parse_batch_from_text(text: str) -> list[tuple[str, str]]:
+    blocks = [block.strip() for block in text.split("---") if block.strip()]
+    profiles: list[tuple[str, str]] = []
+    for index, block in enumerate(blocks, start=1):
+        first_line = block.splitlines()[0].strip() if block.splitlines() else f"Student {index}"
+        label = first_line[:48] if first_line else f"Student {index}"
+        profiles.append((label, block))
+    return profiles
+
+
+def parse_batch_from_files(uploaded_files: list) -> list[tuple[str, str]]:
+    profiles: list[tuple[str, str]] = []
+    for uploaded in uploaded_files:
+        label = Path(uploaded.name).stem.replace("_", " ").title()
+        profiles.append((label, uploaded.read().decode("utf-8", errors="replace")))
+    return profiles
+
+
+def analyze_single_profile(profile_text: str, label: str, filtered_jobs: pd.DataFrame, role: str) -> dict[str, object]:
+    student_skills = extract_skills(profile_text)
+    analysis = analyze_market(filtered_jobs, student_skills)
+    compatibility = compute_resume_compatibility(student_skills, analysis["required_skills"], profile_text, role)
+    missing_top = (analysis["missing"] + ["", "", ""])[:3]
+    return {
+        "student_label": label,
+        "decay_score": analysis["score"],
+        "fit_score": compatibility["overall"],
+        "missing_skill_1": missing_top[0],
+        "missing_skill_2": missing_top[1],
+        "missing_skill_3": missing_top[2],
+        "risk_level": score_label(analysis["score"]),
+        "skills": student_skills,
+        "analysis": analysis,
+        "compatibility": compatibility,
+    }
+
+
+def run_batch_analysis(profiles: list[tuple[str, str]], role: str, filtered_jobs: pd.DataFrame) -> pd.DataFrame:
+    rows = [analyze_single_profile(text, label, filtered_jobs, role) for label, text in profiles]
+    return pd.DataFrame(rows)
+
+
+def aggregate_batch_summary(batch_df: pd.DataFrame) -> dict[str, object]:
+    all_missing: list[str] = []
+    for column in ["missing_skill_1", "missing_skill_2", "missing_skill_3"]:
+        all_missing.extend([skill for skill in batch_df[column].tolist() if skill])
+    top_missing = Counter(all_missing).most_common(5)
+    return {
+        "total": len(batch_df),
+        "high_risk": int((batch_df["decay_score"] >= 75).sum()),
+        "medium_risk": int(((batch_df["decay_score"] >= 45) & (batch_df["decay_score"] < 75)).sum()),
+        "low_risk": int((batch_df["decay_score"] < 45).sum()),
+        "avg_fit": round(float(batch_df["fit_score"].mean()), 1) if len(batch_df) else 0.0,
+        "top_missing": top_missing,
+        "training_focus": [skill for skill, _ in top_missing[:5]],
+    }
+
+
+def build_batch_decay_chart(batch_df: pd.DataFrame) -> go.Figure:
+    fig = go.Figure(
+        go.Bar(
+            x=batch_df["student_label"],
+            y=batch_df["decay_score"],
+            marker_color=["#dc3545" if score >= 75 else "#ffc107" if score >= 45 else "#28a745" for score in batch_df["decay_score"]],
+            text=batch_df["decay_score"],
+            textposition="outside",
+        )
+    )
+    fig.update_layout(title="Skill Decay Risk by Student", xaxis_title="Student", yaxis_title="Decay Risk Score", height=420, yaxis=dict(range=[0, 110]))
+    return fig
+
+
+def build_batch_heatmap(batch_df: pd.DataFrame) -> go.Figure:
+    all_missing: list[str] = []
+    for column in ["missing_skill_1", "missing_skill_2", "missing_skill_3"]:
+        all_missing.extend([skill for skill in batch_df[column].tolist() if skill])
+    top_skills = [skill for skill, _ in Counter(all_missing).most_common(8)]
+    if not top_skills:
+        top_skills = ["No gaps detected"]
+    matrix = []
+    for _, row in batch_df.iterrows():
+        student_missing = {row["missing_skill_1"], row["missing_skill_2"], row["missing_skill_3"]} - {""}
+        matrix.append([1 if skill in student_missing else 0 for skill in top_skills])
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=matrix,
+            x=top_skills,
+            y=batch_df["student_label"].tolist(),
+            colorscale=[[0, "#f8f9fa"], [1, "#dc3545"]],
+            showscale=False,
+        )
+    )
+    fig.update_layout(title="Batch Skill Gap Heatmap", height=420, xaxis_title="High-demand missing skills", yaxis_title="Student")
+    return fig
+
+
+def export_batch_csv(batch_df: pd.DataFrame, role: str, city: str) -> str:
+    export_df = batch_df[
+        ["student_label", "decay_score", "fit_score", "missing_skill_1", "missing_skill_2", "missing_skill_3", "risk_level"]
+    ].copy()
+    export_df.insert(0, "city", city)
+    export_df.insert(0, "role", role)
+    export_df = export_df.rename(columns={
+        "student_label": "student_label",
+        "decay_score": "decay_score",
+        "fit_score": "fit_score",
+        "missing_skill_1": "missing_skill_1",
+        "missing_skill_2": "missing_skill_2",
+        "missing_skill_3": "missing_skill_3",
+        "risk_level": "risk_level",
+    })
+    return export_df.to_csv(index=False)
+
+
+def generate_batch_pdf(batch_df: pd.DataFrame, summary: dict[str, object], role: str, city: str, batch_name: str) -> bytes | None:
+    if FPDF is None:
+        return None
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.set_font("Helvetica", "B", 18)
+    pdf.cell(w=0, h=12, text="SkillPulse Mentor Export Pack", align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(w=0, h=7, text=_pdf_safe(f"Batch: {batch_name or 'Unnamed batch'}  |  Role: {role}  |  City: {city}"), align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(4)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(w=0, h=8, text="Batch Summary", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 10)
+    for line in [
+        f"Total students: {summary['total']}",
+        f"High risk: {summary['high_risk']}  |  Medium risk: {summary['medium_risk']}  |  Low risk: {summary['low_risk']}",
+        f"Average fit score: {summary['avg_fit']}%",
+        f"Top batch-wide missing skills: {', '.join(summary['training_focus']) or 'None'}",
+    ]:
+        pdf.cell(w=0, h=6, text=_pdf_safe(line), new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(3)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(w=0, h=8, text="Student Results", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 9)
+    for _, row in batch_df.iterrows():
+        pdf.multi_cell(
+            w=0,
+            h=5,
+            text=_pdf_safe(
+                f"{row['student_label']} | Decay {row['decay_score']} | Fit {row['fit_score']}% | "
+                f"Missing: {row['missing_skill_1']}, {row['missing_skill_2']}, {row['missing_skill_3']} | {row['risk_level']}"
+            ),
+            new_x="LMARGIN",
+            new_y="NEXT",
+        )
+        pdf.ln(1)
+    return bytes(pdf.output())
+
+
+def generate_readiness_report_pdf(batch_df: pd.DataFrame, summary: dict[str, object], role: str, city: str, batch_name: str) -> bytes | None:
+    if FPDF is None:
+        return None
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.set_font("Helvetica", "B", 20)
+    pdf.cell(w=0, h=12, text="College Placement Readiness Report", align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(w=0, h=7, text=_pdf_safe("SkillPulse — Placement Intelligence Platform"), align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(5)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(w=0, h=8, text="Batch Overview", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 10)
+    overview_lines = [
+        f"Batch name: {batch_name or 'Unnamed batch'}",
+        f"Target role: {role}",
+        f"Target city: {city}",
+        f"Report date: {pd.Timestamp.today().date()}",
+        f"Total profiles analyzed: {summary['total']}",
+        f"High decay risk: {summary['high_risk']}",
+        f"Medium decay risk: {summary['medium_risk']}",
+        f"Low decay risk: {summary['low_risk']}",
+        f"Average resume fit score: {summary['avg_fit']}%",
+    ]
+    for line in overview_lines:
+        pdf.cell(w=0, h=6, text=_pdf_safe(line), new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(3)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(w=0, h=8, text="Recommended 2-week training focus", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 10)
+    focus_skills = summary["training_focus"] or ["No major batch-wide gaps detected"]
+    for index, skill in enumerate(focus_skills, start=1):
+        pdf.cell(w=0, h=6, text=_pdf_safe(f"{index}. {skill}"), new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(3)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(w=0, h=8, text="Student Risk Snapshot", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 9)
+    for _, row in batch_df.iterrows():
+        pdf.multi_cell(
+            w=0,
+            h=5,
+            text=_pdf_safe(
+                f"{row['student_label']}: decay {row['decay_score']}/100 ({row['risk_level']}), "
+                f"fit {row['fit_score']}%, missing {row['missing_skill_1']}, {row['missing_skill_2']}, {row['missing_skill_3']}"
+            ),
+            new_x="LMARGIN",
+            new_y="NEXT",
+        )
+    return bytes(pdf.output())
+
+
+def render_placement_cell_mode(
+    jobs_df: pd.DataFrame,
+    role: str,
+    city: str,
+    batch_name: str,
+    batch_profiles: list[tuple[str, str]],
+) -> None:
+    st.markdown("### Placement Cell Mode")
+    st.caption(
+        "Analyze a full student batch against the same role and city market signals. "
+        "Skill decay risk measures how far each profile lags behind current hiring demand."
+    )
+    filtered_jobs = jobs_df[(jobs_df["role"] == role) & (jobs_df["city"] == city)].copy()
+    if filtered_jobs.empty:
+        st.error("No job postings available for this role/city combination in the current dataset.")
+        st.stop()
+    if len(batch_profiles) < 1:
+        st.info("Add at least one student profile in the sidebar using upload, paste, or **Load demo batch (3 students)**.")
+        st.stop()
+
+    batch_df = run_batch_analysis(batch_profiles, role, filtered_jobs)
+    summary = aggregate_batch_summary(batch_df)
+
+    metric_cols = st.columns(4)
+    metric_cols[0].metric("Students Analyzed", summary["total"])
+    metric_cols[1].metric("High-Risk Students", summary["high_risk"])
+    metric_cols[2].metric("Average Fit Score", f"{summary['avg_fit']}%")
+    metric_cols[3].metric("Job Postings", len(filtered_jobs))
+
+    focus_text = ", ".join(summary["training_focus"]) if summary["training_focus"] else "No major batch-wide gaps detected"
+    st.success(f"Recommended 2-week training focus: **{focus_text}**")
+
+    st.markdown('<p class="section-header">College Placement Readiness Report</p>', unsafe_allow_html=True)
+    display_batch = batch_name.strip() or "Unnamed batch"
+    st.markdown(f"**Batch:** {display_batch}")
+    readiness_cols = st.columns(3)
+    readiness_cols[0].metric("High Risk", summary["high_risk"])
+    readiness_cols[1].metric("Medium Risk", summary["medium_risk"])
+    readiness_cols[2].metric("Low Risk", summary["low_risk"])
+    st.caption(f"Role: **{role}** | City: **{city}** | Profiles: **{summary['total']}** | Date: **{pd.Timestamp.today().date()}**")
+
+    table_df = batch_df[
+        ["student_label", "decay_score", "fit_score", "missing_skill_1", "missing_skill_2", "missing_skill_3", "risk_level"]
+    ].rename(columns={
+        "student_label": "Student",
+        "decay_score": "Decay Risk",
+        "fit_score": "Fit Score",
+        "missing_skill_1": "Missing Skill 1",
+        "missing_skill_2": "Missing Skill 2",
+        "missing_skill_3": "Missing Skill 3",
+        "risk_level": "Risk Level",
+    })
+    st.markdown('<p class="section-header">Batch Results</p>', unsafe_allow_html=True)
+    st.dataframe(table_df, use_container_width=True, hide_index=True)
+
+    chart_left, chart_right = st.columns(2)
+    with chart_left:
+        st.plotly_chart(build_batch_decay_chart(batch_df), use_container_width=True)
+    with chart_right:
+        st.plotly_chart(build_batch_heatmap(batch_df), use_container_width=True)
+
+    if summary["top_missing"]:
+        st.markdown('<p class="section-header">Top Batch-Wide Missing Skills</p>', unsafe_allow_html=True)
+        for skill, count in summary["top_missing"]:
+            st.markdown(f"- **{skill}** — missing in **{count}** student profile(s)")
+
+    st.markdown('<p class="section-header">Mentor Export Pack</p>', unsafe_allow_html=True)
+    export_cols = st.columns(3)
+    csv_data = export_batch_csv(batch_df, role, city)
+    with export_cols[0]:
+        st.download_button(
+            "Export Batch CSV",
+            data=csv_data.encode("utf-8"),
+            file_name=f"skillpulse_batch_{role.replace(' ', '_')}_{city}.csv",
+            mime="text/csv",
+        )
+    batch_pdf = generate_batch_pdf(batch_df, summary, role, city, batch_name)
+    with export_cols[1]:
+        if batch_pdf:
+            st.download_button(
+                "Export Batch PDF",
+                data=batch_pdf,
+                file_name=f"skillpulse_batch_{role.replace(' ', '_')}_{city}.pdf",
+                mime="application/pdf",
+            )
+        else:
+            st.caption("Install `fpdf2` for PDF export.")
+    readiness_pdf = generate_readiness_report_pdf(batch_df, summary, role, city, batch_name)
+    with export_cols[2]:
+        if readiness_pdf:
+            st.download_button(
+                "College Readiness Report (PDF)",
+                data=readiness_pdf,
+                file_name=f"skillpulse_readiness_{role.replace(' ', '_')}_{city}.pdf",
+                mime="application/pdf",
+            )
+        else:
+            st.caption("Install `fpdf2` for readiness PDF.")
+
+
 # ---- Main ----
 
 def main() -> None:
@@ -1274,108 +1668,165 @@ def main() -> None:
     jobs_df = load_cached_jobs()
 
     with st.sidebar:
+        st.header("Mode")
+        app_mode = st.radio("App mode", ["Student Mode", "Placement Cell Mode"], horizontal=True)
+        st.divider()
         st.header("Configuration")
         role = st.selectbox("Target role", sorted(jobs_df["role"].unique()))
         city = st.selectbox("Target city", sorted(jobs_df["city"].unique()))
-        st.divider()
-        st.subheader("Resume Upload")
-        resume_upload = st.file_uploader("Upload your resume (PDF, DOCX, or TXT)", type=["pdf", "docx", "txt"], help="We'll extract text and auto-detect your skills.")
-        uploaded_resume_text = ""
-        if resume_upload is not None:
-            with st.spinner("Extracting text from resume..."):
-                uploaded_resume_text = extract_text_from_upload(resume_upload)
-            if uploaded_resume_text and not uploaded_resume_text.startswith("["):
-                st.success(f"Extracted {len(uploaded_resume_text)} characters from {resume_upload.name}")
-            elif uploaded_resume_text.startswith("["):
-                st.warning(uploaded_resume_text)
-                uploaded_resume_text = ""
-        st.divider()
-        st.subheader("Student Profile")
-        st.caption("Use Apply profile to avoid rerunning Gemini and GitHub analysis on every sidebar change.")
-        if "applied_profile_text" not in st.session_state:
-            st.session_state.applied_profile_text = ""
-        if "applied_portfolio_source" not in st.session_state:
-            st.session_state.applied_portfolio_source = ""
-        if "applied_profile_label" not in st.session_state:
-            st.session_state.applied_profile_label = "Fresh profile"
-        with st.form("profile_input_form"):
-            profile_choice = st.radio(
-                "Profile source",
-                options=[
-                    "Uploaded Resume" if resume_upload else "Upload a resume above",
-                    "Fresh profile",
-                    "Sample (Strong match)",
-                    "Sample (Weak match)",
-                    "Resume (AIML/Data)",
-                    "Resume (SDE/Full-stack)",
-                    "Custom paste",
-                ],
-                index=1,
+        batch_name = ""
+        batch_profiles: list[tuple[str, str]] = []
+
+        if app_mode == "Placement Cell Mode":
+            st.divider()
+            st.subheader("Placement Cell Batch")
+            batch_name = st.text_input("Batch name (optional)", placeholder="e.g. Final Year Analytics Batch")
+            if st.button("Load demo batch (3 students)", use_container_width=True):
+                st.session_state.batch_paste_text = "\n---\n".join(
+                    text for _, text in load_demo_batch_profiles()
+                )
+            batch_files = st.file_uploader(
+                "Upload student profiles (TXT)",
+                type=["txt"],
+                accept_multiple_files=True,
+                help="Upload one TXT file per student profile.",
             )
-            if "Uploaded Resume" in profile_choice and uploaded_resume_text:
-                profile_text = uploaded_resume_text
-            elif profile_choice == "Fresh profile":
-                profile_text = ""
-            elif profile_choice == "Sample (Strong match)":
-                profile_text = SAMPLE_RESUME_PATH.read_text(encoding="utf-8")
-            elif profile_choice == "Sample (Weak match)":
-                profile_text = SAMPLE_RESUME_ALT_PATH.read_text(encoding="utf-8")
-            elif profile_choice == "Resume (AIML/Data)":
-                profile_text = RESUME_VISSHVA_AIML_PATH.read_text(encoding="utf-8")
-            elif profile_choice == "Resume (SDE/Full-stack)":
-                profile_text = RESUME_VISSHVA_SDE_PATH.read_text(encoding="utf-8")
-            else:
-                profile_text = st.session_state.applied_profile_text if profile_choice == st.session_state.applied_profile_label else ""
-            profile_text = st.text_area(
-                "Edit or paste profile text",
-                value=profile_text,
-                height=220,
-                placeholder="Paste a fresh resume summary, skills, projects, or achievements here...",
+            if "batch_paste_text" not in st.session_state:
+                st.session_state.batch_paste_text = ""
+            batch_paste_text = st.text_area(
+                "Paste multiple profiles (separate with ---)",
+                value=st.session_state.batch_paste_text,
+                height=180,
+                placeholder="Student 1 profile...\n---\nStudent 2 profile...\n---\nStudent 3 profile...",
             )
-            portfolio_source = st.text_input(
-                "GitHub / portfolio URL or notes (optional)",
-                value=st.session_state.applied_portfolio_source,
-                placeholder="https://github.com/username or brief portfolio notes",
-            )
-            apply_profile = st.form_submit_button("Apply profile")
-        if apply_profile:
-            st.session_state.applied_profile_text = profile_text
-            st.session_state.applied_portfolio_source = portfolio_source
-            st.session_state.applied_profile_label = profile_choice
-        profile_text = st.session_state.applied_profile_text
-        portfolio_source = st.session_state.applied_portfolio_source
-        profile_choice = st.session_state.applied_profile_label
-        github_username = parse_github_username(portfolio_source)
-        github_data = {"username": "", "skills": [], "summary": "", "repos": []}
-        if github_username:
-            try:
-                with st.spinner("Analyzing GitHub profile..."):
-                    github_data = fetch_github_profile_data(github_username)
-                st.success(f"Loaded public GitHub signals for @{github_username}")
-                if github_data["skills"]:
-                    st.caption("GitHub-detected skills: " + ", ".join(github_data["skills"][:8]))
-            except Exception as error:
-                st.warning(f"GitHub analysis unavailable: {error}")
-        elif profile_choice == "Fresh profile" and not profile_text.strip():
-            st.info("Paste or upload a profile, then click Apply profile.")
-        st.divider()
-        st.subheader("Data Source")
-        uploaded_csv = st.file_uploader("Upload a live jobs CSV (optional)", type=["csv"])
-        if uploaded_csv is not None:
-            try:
-                jobs_df = _standardize_jobs_df(pd.read_csv(uploaded_csv))
-                st.success("Loaded uploaded job dataset.")
-            except Exception as error:
-                st.error(f"Could not read uploaded CSV: {error}")
-        live_limit = st.slider("Live refresh size", min_value=10, max_value=80, value=30, step=10)
-        if st.button("Refresh live signals"):
-            try:
-                live_df = _standardize_jobs_df(fetch_live_jobs(role=role, city=city, limit=live_limit))
-                live_df.to_csv(LIVE_CACHE_PATH, index=False)
-                st.success("Live refresh complete.")
-                st.cache_data.clear()
-            except Exception as error:
-                st.warning(f"Live refresh not available: {error}")
+            st.session_state.batch_paste_text = batch_paste_text
+            if batch_files:
+                batch_profiles.extend(parse_batch_from_files(batch_files))
+            if batch_paste_text.strip():
+                batch_profiles.extend(parse_batch_from_text(batch_paste_text))
+            seen_labels: set[tuple[str, str]] = set()
+            deduped_profiles: list[tuple[str, str]] = []
+            for label, text in batch_profiles:
+                key = (label, text[:120])
+                if key not in seen_labels:
+                    seen_labels.add(key)
+                    deduped_profiles.append((label, text))
+            batch_profiles = deduped_profiles
+            if batch_profiles:
+                st.caption(f"{len(batch_profiles)} profile(s) ready for batch analysis.")
+            st.divider()
+            st.subheader("Data Source")
+            uploaded_csv = st.file_uploader("Upload a live jobs CSV (optional)", type=["csv"], key="placement_csv")
+            if uploaded_csv is not None:
+                try:
+                    jobs_df = _standardize_jobs_df(pd.read_csv(uploaded_csv))
+                    st.success("Loaded uploaded job dataset.")
+                except Exception as error:
+                    st.error(f"Could not read uploaded CSV: {error}")
+        else:
+            st.divider()
+            st.subheader("Resume Upload")
+            resume_upload = st.file_uploader("Upload your resume (PDF, DOCX, or TXT)", type=["pdf", "docx", "txt"], help="We'll extract text and auto-detect your skills.")
+            uploaded_resume_text = ""
+            if resume_upload is not None:
+                with st.spinner("Extracting text from resume..."):
+                    uploaded_resume_text = extract_text_from_upload(resume_upload)
+                if uploaded_resume_text and not uploaded_resume_text.startswith("["):
+                    st.success(f"Extracted {len(uploaded_resume_text)} characters from {resume_upload.name}")
+                elif uploaded_resume_text.startswith("["):
+                    st.warning(uploaded_resume_text)
+                    uploaded_resume_text = ""
+            st.divider()
+            st.subheader("Student Profile")
+            st.caption("Use Apply profile to avoid rerunning Gemini and GitHub analysis on every sidebar change.")
+            if "applied_profile_text" not in st.session_state:
+                st.session_state.applied_profile_text = ""
+            if "applied_portfolio_source" not in st.session_state:
+                st.session_state.applied_portfolio_source = ""
+            if "applied_profile_label" not in st.session_state:
+                st.session_state.applied_profile_label = "Fresh profile"
+            with st.form("profile_input_form"):
+                profile_choice = st.radio(
+                    "Profile source",
+                    options=[
+                        "Uploaded Resume" if resume_upload else "Upload a resume above",
+                        "Fresh profile",
+                        "Sample (Strong match)",
+                        "Sample (Weak match)",
+                        "Resume (AIML/Data)",
+                        "Resume (SDE/Full-stack)",
+                        "Custom paste",
+                    ],
+                    index=1,
+                )
+                if "Uploaded Resume" in profile_choice and uploaded_resume_text:
+                    profile_text = uploaded_resume_text
+                elif profile_choice == "Fresh profile":
+                    profile_text = ""
+                elif profile_choice == "Sample (Strong match)":
+                    profile_text = SAMPLE_RESUME_PATH.read_text(encoding="utf-8")
+                elif profile_choice == "Sample (Weak match)":
+                    profile_text = SAMPLE_RESUME_ALT_PATH.read_text(encoding="utf-8")
+                elif profile_choice == "Resume (AIML/Data)":
+                    profile_text = RESUME_VISSHVA_AIML_PATH.read_text(encoding="utf-8")
+                elif profile_choice == "Resume (SDE/Full-stack)":
+                    profile_text = RESUME_VISSHVA_SDE_PATH.read_text(encoding="utf-8")
+                else:
+                    profile_text = st.session_state.applied_profile_text if profile_choice == st.session_state.applied_profile_label else ""
+                profile_text = st.text_area(
+                    "Edit or paste profile text",
+                    value=profile_text,
+                    height=220,
+                    placeholder="Paste a fresh resume summary, skills, projects, or achievements here...",
+                )
+                portfolio_source = st.text_input(
+                    "GitHub / portfolio URL or notes (optional)",
+                    value=st.session_state.applied_portfolio_source,
+                    placeholder="https://github.com/username or brief portfolio notes",
+                )
+                apply_profile = st.form_submit_button("Apply profile")
+            if apply_profile:
+                st.session_state.applied_profile_text = profile_text
+                st.session_state.applied_portfolio_source = portfolio_source
+                st.session_state.applied_profile_label = profile_choice
+            profile_text = st.session_state.applied_profile_text
+            portfolio_source = st.session_state.applied_portfolio_source
+            profile_choice = st.session_state.applied_profile_label
+            github_username = parse_github_username(portfolio_source)
+            github_data = {"username": "", "skills": [], "summary": "", "repos": []}
+            if github_username:
+                try:
+                    with st.spinner("Analyzing GitHub profile..."):
+                        github_data = fetch_github_profile_data(github_username)
+                    st.success(f"Loaded public GitHub signals for @{github_username}")
+                    if github_data["skills"]:
+                        st.caption("GitHub-detected skills: " + ", ".join(github_data["skills"][:8]))
+                except Exception as error:
+                    st.warning(f"GitHub analysis unavailable: {error}")
+            elif profile_choice == "Fresh profile" and not profile_text.strip():
+                st.info("Paste or upload a profile, then click Apply profile.")
+            st.divider()
+            st.subheader("Data Source")
+            uploaded_csv = st.file_uploader("Upload a live jobs CSV (optional)", type=["csv"])
+            if uploaded_csv is not None:
+                try:
+                    jobs_df = _standardize_jobs_df(pd.read_csv(uploaded_csv))
+                    st.success("Loaded uploaded job dataset.")
+                except Exception as error:
+                    st.error(f"Could not read uploaded CSV: {error}")
+            live_limit = st.slider("Live refresh size", min_value=10, max_value=80, value=30, step=10)
+            if st.button("Refresh live signals"):
+                try:
+                    live_df = _standardize_jobs_df(fetch_live_jobs(role=role, city=city, limit=live_limit))
+                    live_df.to_csv(LIVE_CACHE_PATH, index=False)
+                    st.success("Live refresh complete.")
+                    st.cache_data.clear()
+                except Exception as error:
+                    st.warning(f"Live refresh not available: {error}")
+
+    if app_mode == "Placement Cell Mode":
+        render_placement_cell_mode(jobs_df, role, city, batch_name, batch_profiles)
+        return
 
     filtered_jobs = jobs_df[(jobs_df["role"] == role) & (jobs_df["city"] == city)].copy()
     if filtered_jobs.empty:
@@ -1404,17 +1855,8 @@ def main() -> None:
     market_alert = build_market_alert(analysis, student_skills, role, portfolio_source.strip())
     micro_curriculum = generate_micro_curriculum(analysis["missing"])
 
-    # Gemini with caching (convert lists to hashable strings)
     missing_key = ",".join(analysis["missing"][:3]) if analysis["missing"] else ""
     skills_key = ",".join(student_skills)
-    gemini_curriculum = None
-    gemini_status = "Gemini not checked yet."
-    try:
-        gemini_curriculum, gemini_error = generate_gemini_curriculum(missing_key, role, city, skills_key)
-        gemini_status = "Gemini live generation enabled." if gemini_curriculum else (gemini_error or "Gemini did not return content.")
-    except Exception as error:
-        gemini_curriculum = None
-        gemini_status = f"Gemini request failed: {error}"
 
     profile_key = build_profile_key(profile_context, role, city, github_data.get("username", ""))
     record_snapshot(profile_key, role, city, analysis, compatibility_data, student_skills)
@@ -1445,7 +1887,10 @@ def main() -> None:
     metrics[2].metric("Skills Detected", len(student_skills))
     metrics[3].metric("Market Matches", len(analysis["matched"]))
     metrics[4].metric("Decay Risk", f"{analysis['score']}/100", score_label(analysis["score"]))
-    st.caption(f"Trend window: recent postings since **{analysis['recent_cutoff'].date()}** vs older postings.")
+    st.caption(
+        f"Trend window: recent postings since **{analysis['recent_cutoff'].date()}** vs older postings. "
+        "Skill decay risk rises when high-demand skills are missing or market signals are shifting away from the current profile."
+    )
 
     tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
         "Dashboard",
@@ -1649,6 +2094,11 @@ def main() -> None:
                     for resource in block["resources"]:
                         st.markdown(f"- [{resource['title']}]({resource['url']}) -- {resource['type']} ({resource['time']})")
         st.markdown('<p class="section-header">Gemini Vision Layer</p>', unsafe_allow_html=True)
+        st.caption("Optional AI-enhanced curriculum. Generation runs only when you request it.")
+        request_gemini = st.button("Generate with Gemini", key="generate_gemini_btn")
+        gemini_curriculum, gemini_status = resolve_gemini_curriculum(
+            missing_key, role, city, skills_key, request_gemini
+        )
         st.caption(gemini_status)
         if gemini_curriculum:
             st.markdown(gemini_curriculum)
