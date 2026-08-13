@@ -14,3 +14,15 @@ env/
 !.streamlit/config.toml
 data/live_cache.csv
 data/profile_snapshots.json
+
+# Local QA / Antigravity artifacts (keep on disk, do not publish)
+ANTIGRAVITY_PRE_PUSH_PROMPT.md
+pre_push_test_report.md
+pre_push_test_report*.md
+qa_results.json
+screenshots_browser/
+scripts/browser_qa_runner.py
+scripts/qa_ui_test.py
+
+# Event/presentation deck with hackathon branding (local only)
+slides/

@@ -1,6 +1,6 @@
 # SkillPulse
 
-`SkillPulse` is a market-intelligence and career guidance platform that detects emerging skill decay, identifies role-specific skill gaps, and generates proof-oriented learning roadmaps for early-career talent and placement teams.
+SkillPulse compares a profile to role-specific hiring signals, scores skill decay risk from job-post evidence, and turns gaps into a concrete proof plan for students and placement batches.
 
 **Live demo:** [https://skillpulse-visshva.streamlit.app/](https://skillpulse-visshva.streamlit.app/)
 
@@ -9,8 +9,8 @@
 SkillPulse helps learners and placement teams answer:
 
 1. Which skills still match current hiring demand?
-2. Which high-signal skills are rising and missing from a profile or batch?
-3. What should students build next to prove those missing skills credibly?
+2. Which rising skills are missing from a profile or batch?
+3. What should students build next to prove those skills?
 
 ## Problem
 
@@ -34,43 +34,48 @@ SkillPulse compares learner profiles against recent role-specific job data and p
 
 ### Student Mode
 - Resume upload for `PDF`, `DOCX`, or `TXT` (10 MB limit)
-- Skill extraction, gap analysis, decay risk, and resume compatibility
+- Five tabs: Overview, Market Evidence, Fit & Roadmap, Plan & Progress, Grow
+- Decay risk hero with evidence preview, next action, and score methodology
 - Rising/declining trends, salary/openings, career paths, benchmarks
-- 7-day proof plan, proof pack, and competition suggestions
-- Optional on-demand Gemini micro-curriculum (cached)
-- Optional Adzuna live refresh
-- GitHub portfolio enrichment
+- 7-day roadmap, proof pack, snapshot history CSV, optional AI study plan
+- Optional Adzuna live refresh and GitHub portfolio enrichment
 - Individual Markdown/PDF report download
 
 ### Placement Cell Mode
 - Toggle between **Student Mode** and **Placement Cell Mode**
 - Multi-profile input via TXT upload, `---` separated paste, or demo batch preset
-- Batch table: decay risk, fit score, top missing skills, risk level
-- Batch decay bar chart and skill-gap heatmap
-- Export Batch CSV, Export Batch PDF, and College Readiness Report (PDF)
+- Batch table sorted high-risk first: decay risk, fit score, missing skills, risk level
+- Batch decay chart, skill-gap heatmap, mentor action plan CSV
+- Export Batch CSV/PDF and College Readiness Report (PDF)
 
 ## Dataset Coverage
 
-- **88** curated job postings
+- **146** curated job postings (at least 2 per role×city; AI/ML Intern thickened to 4–7 per city)
 - **8 roles:** Junior Data Analyst, Frontend Developer, AI/ML Intern, Business Analyst, Data Science Intern, SDE / Full-stack Developer, FinTech Analyst, Healthcare Data Analyst
 - **7 cities:** Chennai, Bengaluru, Hyderabad, Pune, Gurugram, Mumbai, Delhi
 
-## Why SkillPulse Stands Out
+## Why this project
 
-- `Novelty`: focuses on skill decay and market drift instead of generic course recommendation
-- `Utility`: converts skill gaps into concrete, portfolio-oriented action
-- `Explainability`: shows the evidence behind trend shifts
-- `Reliability`: works offline with curated data while remaining compatible with live updates
-- `Scale`: supports individual students and full placement batches from the same engine
+- Focuses on skill decay and market drift, not generic course lists
+- Turns gaps into portfolio work you can actually ship
+- Shows the job-post evidence behind each trend
+- Runs offline on curated data, with optional live refresh
+- Same engine for one student or a full placement batch
 
 ## Project Structure
 
-- `app.py` — Streamlit application
-- `data/job_postings.csv` — curated job dataset
-- `data/sample_resume.txt` / `data/sample_resume_alt.txt` — demo profiles
-- `data/sample_batch_student_3.txt` — third demo student for batch mode
-- `TECHNICAL_DOCUMENTATION.md` — architecture and technical reference
-- `scripts/feature_smoke_test.py` — local feature smoke test
+- `app.py` - thin Streamlit entry point
+- `skillpulse/` - Python package
+  - `config.py` - paths, constants, skill maps, CSS
+  - `skills.py`, `market.py`, `curriculum.py`, `snapshots.py` - core analysis
+  - `data_loader.py`, `resume_io.py`, `github_enrichment.py`, `gemini_curriculum.py` - data and enrichment
+  - `charts.py`, `reports.py`, `batch.py` - visualization and exports
+  - `ui/` - Streamlit sidebar, student view, and app orchestration
+- `data/job_postings.csv` - curated job dataset
+- `data/sample_resume.txt` / `data/sample_resume_alt.txt` - demo profiles
+- `data/sample_batch_student_3.txt` - third demo student for batch mode
+- `TECHNICAL_DOCUMENTATION.md` - architecture and technical reference
+- `scripts/feature_smoke_test.py` - local feature smoke test
 
 ## Setup
 

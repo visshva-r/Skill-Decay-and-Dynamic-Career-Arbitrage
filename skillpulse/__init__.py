@@ -1,0 +1,1 @@
+"""SkillPulse application package."""
