@@ -24,5 +24,5 @@ screenshots_browser/
 scripts/browser_qa_runner.py
 scripts/qa_ui_test.py
 
-# Event/presentation deck with hackathon branding (local only)
+# Local presentation assets (not part of the app)
 slides/

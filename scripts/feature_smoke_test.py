@@ -29,7 +29,7 @@ from skillpulse.charts import (
     build_salary_chart,
     build_trend_chart,
 )
-from skillpulse.config import BENCHMARK_PROFILES, HACKATHON_MAP
+from skillpulse.config import BENCHMARK_PROFILES
 from skillpulse.curriculum import build_proof_pack, generate_micro_curriculum, roadmap_for_skills
 from skillpulse.data_loader import load_jobs, normalize_city_name
 from skillpulse.market import analyze_market, build_market_alert, compute_resume_compatibility
@@ -99,8 +99,6 @@ def main() -> None:
     check("Micro curriculum", len(generate_micro_curriculum(analysis["missing"])) >= 1)
     check("Market alert", "title" in build_market_alert(analysis, weak, "Junior Data Analyst", ""))
     check("Learning resources", len(get_learning_resources("Financial Modeling")) >= 2)
-    check("Hackathon map", len(HACKATHON_MAP) > 0)
-
     profiles = load_demo_batch_profiles()
     batch_jobs = df[df["role"] == "Junior Data Analyst"]
     batch = run_batch_analysis(profiles, "Junior Data Analyst", batch_jobs)

@@ -27,7 +27,6 @@ SkillPulse compares learner profiles against recent role-specific job data and p
 - salary insights and position openings
 - month-over-month skill trend analysis
 - a 7-day micro-roadmap and proof pack
-- competition recommendations for portfolio building
 - institutional batch dashboards and mentor exports
 
 ## Key Capabilities

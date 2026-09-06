@@ -19,7 +19,7 @@ from skillpulse.charts import (
     build_skill_gap_chart,
     build_trend_chart,
 )
-from skillpulse.config import BENCHMARK_PROFILES, HACKATHON_MAP, LEARNING_RESOURCES, PROJECT_MAP
+from skillpulse.config import BENCHMARK_PROFILES, LEARNING_RESOURCES, PROJECT_MAP
 from skillpulse.curriculum import build_proof_pack, generate_micro_curriculum, roadmap_for_skills
 from skillpulse.gemini_curriculum import resolve_gemini_curriculum, show_gemini_setup_hint
 from skillpulse.market import (
@@ -414,20 +414,6 @@ def render_student_view(
                         f"[Open resource]({resource['url']})"
                     )
                     st.divider()
-
-        st.markdown('<p class="section-header">Competitions & hackathons (optional)</p>', unsafe_allow_html=True)
-        st.caption("Timed practice only. Not a substitute for the proof pack in Fit & Roadmap.")
-        with st.expander("Competitions & hackathons (optional)", expanded=False):
-            hackathon_skills = analysis["missing"] if analysis["missing"] else list(HACKATHON_MAP.keys())[:3]
-            seen_hackathons: set[str] = set()
-            for skill in hackathon_skills:
-                hacks = HACKATHON_MAP.get(skill, [])
-                if hacks:
-                    st.markdown(f"**{skill}**")
-                    for h in hacks:
-                        if h["name"] not in seen_hackathons:
-                            seen_hackathons.add(h["name"])
-                            st.markdown(f"- [{h['name']}]({h['url']}): {h['platform']} ({h['type']})")
 
         st.markdown('<p class="section-header">Career path</p>', unsafe_allow_html=True)
         st.plotly_chart(build_career_path_chart(role, student_skills), width="stretch")

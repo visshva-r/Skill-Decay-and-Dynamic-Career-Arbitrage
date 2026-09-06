@@ -290,67 +290,6 @@ CAREER_PATHS = {
     },
 }
 
-# --- Hackathon Recommendations ---
-HACKATHON_MAP = {
-    "Machine Learning": [
-        {"name": "Kaggle Competitions", "url": "https://www.kaggle.com/competitions", "platform": "Kaggle", "type": "Ongoing"},
-        {"name": "Google ML Challenge", "url": "https://developers.google.com/machine-learning", "platform": "Google", "type": "Annual"},
-    ],
-    "Deep Learning": [
-        {"name": "Kaggle Competitions", "url": "https://www.kaggle.com/competitions", "platform": "Kaggle", "type": "Ongoing"},
-    ],
-    "NLP": [
-        {"name": "SemEval Shared Tasks", "url": "https://semeval.github.io/", "platform": "ACL", "type": "Annual"},
-        {"name": "Kaggle NLP Competitions", "url": "https://www.kaggle.com/competitions?tagIds=11208", "platform": "Kaggle", "type": "Ongoing"},
-    ],
-    "Computer Vision": [
-        {"name": "Kaggle Vision Competitions", "url": "https://www.kaggle.com/competitions", "platform": "Kaggle", "type": "Ongoing"},
-    ],
-    "Python": [
-        {"name": "Unstop Hackathons", "url": "https://unstop.com/hackathons", "platform": "Unstop", "type": "Rolling"},
-        {"name": "HackerRank Challenges", "url": "https://www.hackerrank.com/domains/python", "platform": "HackerRank", "type": "Ongoing"},
-    ],
-    "React.js": [
-        {"name": "MLH Hackathons", "url": "https://mlh.io/seasons/2026/events", "platform": "MLH", "type": "Seasonal"},
-        {"name": "Devpost Hackathons", "url": "https://devpost.com/hackathons", "platform": "Devpost", "type": "Rolling"},
-    ],
-    "TypeScript": [
-        {"name": "MLH Hackathons", "url": "https://mlh.io/seasons/2026/events", "platform": "MLH", "type": "Seasonal"},
-        {"name": "Devpost Hackathons", "url": "https://devpost.com/hackathons", "platform": "Devpost", "type": "Rolling"},
-    ],
-    "Next.js": [
-        {"name": "Vercel Hackathons", "url": "https://devpost.com/hackathons", "platform": "Devpost", "type": "Rolling"},
-    ],
-    "Docker": [
-        {"name": "Docker Community Challenges", "url": "https://www.docker.com/community", "platform": "Docker", "type": "Periodic"},
-    ],
-    "SQL": [
-        {"name": "HackerRank SQL Challenges", "url": "https://www.hackerrank.com/domains/sql", "platform": "HackerRank", "type": "Ongoing"},
-        {"name": "StrataScratch Practice", "url": "https://www.stratascratch.com/", "platform": "StrataScratch", "type": "Ongoing"},
-    ],
-    "Power BI": [
-        {"name": "Maven Analytics Challenges", "url": "https://mavenanalytics.io/challenges", "platform": "Maven Analytics", "type": "Monthly"},
-    ],
-    "Tableau": [
-        {"name": "Makeover Monday", "url": "https://www.makeovermonday.co.uk/", "platform": "Community", "type": "Weekly"},
-    ],
-    "Prompt Engineering": [
-        {"name": "Unstop AI Hackathons", "url": "https://unstop.com/hackathons", "platform": "Unstop", "type": "Rolling"},
-    ],
-    "Data Visualization": [
-        {"name": "Makeover Monday", "url": "https://www.makeovermonday.co.uk/", "platform": "Community", "type": "Weekly"},
-    ],
-    "Excel": [
-        {"name": "Excel World Championship", "url": "https://fmworldcup.com/", "platform": "FMWC", "type": "Annual"},
-    ],
-    "Node.js": [
-        {"name": "Devpost Hackathons", "url": "https://devpost.com/hackathons", "platform": "Devpost", "type": "Rolling"},
-    ],
-    "REST APIs": [
-        {"name": "Postman API Hackathons", "url": "https://www.postman.com/", "platform": "Postman", "type": "Periodic"},
-    ],
-}
-
 # --- Benchmark Profiles (Placed Professionals) ---
 BENCHMARK_PROFILES = {
     "Junior Data Analyst": {

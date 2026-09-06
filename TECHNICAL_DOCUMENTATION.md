@@ -37,7 +37,7 @@ Both flows use the same core analysis functions. Placement Cell Mode does not du
 | Module | Purpose |
 |--------|---------|
 | `app.py` | Thin entry: `load_dotenv`, page config, calls `skillpulse.ui.app.main()` |
-| `skillpulse/config.py` | Paths, constants, `CUSTOM_CSS`, skill/project/hackathon maps |
+| `skillpulse/config.py` | Paths, constants, `CUSTOM_CSS`, skill/project/benchmark maps |
 | `skillpulse/secrets.py` | `get_secret()` from env or Streamlit secrets |
 | `skillpulse/skills.py` | `extract_skills`, `normalize_token`, `count_skills`, `get_learning_resources` |
 | `skillpulse/resume_io.py` | PDF/DOCX/TXT upload parsing, GitHub username parsing |
@@ -59,7 +59,7 @@ Both flows use the same core analysis functions. Placement Cell Mode does not du
 
 - Visual system uses ink/slate + teal accent (not purple gradient “AI dashboard” defaults).
 - Overview leads with decay status, top evidence line, and one next action.
-- Optional Gemini is labeled **AI study plan**; competitions sit under Grow as secondary.
+- Optional Gemini is labeled **AI study plan**; Grow focuses on learning resources, career paths, and benchmarks.
 
 ---
 
