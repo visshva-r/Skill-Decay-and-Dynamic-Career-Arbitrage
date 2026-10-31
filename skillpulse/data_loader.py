@@ -78,6 +78,11 @@ def _adzuna_secrets() -> tuple[str, str, str]:
     return app_id, app_key, country
 
 
+def has_adzuna_credentials() -> bool:
+    app_id, app_key, _ = _adzuna_secrets()
+    return bool(app_id and app_key)
+
+
 def _extract_api_skills(job_text: str) -> list[str]:
     return extract_skills(job_text)[:8]
 

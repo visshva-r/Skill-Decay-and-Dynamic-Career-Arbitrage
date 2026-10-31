@@ -25,13 +25,17 @@ def build_proof_pack(missing: list[str], student_skills: list[str]) -> dict[str,
     support_skill = missing[1] if len(missing) > 1 else (student_skills[0] if student_skills else "SQL")
     project_title = f"{target_skill} Career Proof Dashboard"
     project_idea = PROJECT_MAP.get(target_skill, f"Build a mini project showing {target_skill} in action with a realistic student-friendly dataset.")
+    acceptance_criteria = (
+        f"Ship a working demo, document 3 insights, and include 1 measurable result tied to {target_skill}."
+    )
     resume_bullet = (
         f"Built a {target_skill}-focused analytics project integrating {support_skill} to solve a real reporting use case, "
-        "documented insights, and packaged the work for recruiter review."
+        f"documented insights, and packaged the work for recruiter review; success measured by: {acceptance_criteria}"
     )
     return {
         "title": project_title,
         "idea": project_idea,
+        "acceptance_criteria": acceptance_criteria,
         "resume_bullet": resume_bullet,
         "github_blurb": f"{project_title}: a portfolio project built to demonstrate market-relevant analytics skills for fresher roles.",
     }

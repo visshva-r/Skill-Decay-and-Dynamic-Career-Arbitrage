@@ -27,11 +27,12 @@ from skillpulse.charts import (
     build_radar_chart,
     build_resume_gauge,
     build_salary_chart,
+    build_skill_gap_chart,
     build_trend_chart,
 )
 from skillpulse.config import BENCHMARK_PROFILES
 from skillpulse.curriculum import build_proof_pack, generate_micro_curriculum, roadmap_for_skills
-from skillpulse.data_loader import load_jobs, normalize_city_name
+from skillpulse.data_loader import has_adzuna_credentials, load_jobs, normalize_city_name
 from skillpulse.market import analyze_market, build_market_alert, compute_resume_compatibility
 from skillpulse.reports import generate_batch_pdf, generate_pdf_report, generate_readiness_report_pdf
 from skillpulse.skills import extract_skills, get_learning_resources
@@ -72,7 +73,7 @@ def main() -> None:
         analysis = analyze_market(jobs, weak)
         compat = compute_resume_compatibility(weak, analysis["required_skills"], "weak profile", role)
         check(f"Market analysis: {role}", analysis["score"] > 0)
-        check(f"Evidence cards present: {role}", len(analysis.get("evidence_cards", [])) >= 0)
+        check(f"Evidence cards present: {role}", len(analysis.get("evidence_cards", [])) >= 1)
         check(f"Compatibility score: {role}", 0 <= compat["overall"] <= 100)
 
     jobs = df[(df["role"] == "Junior Data Analyst") & (df["city"] == "Chennai")]
@@ -89,6 +90,9 @@ def main() -> None:
     check("Radar chart builds", build_radar_chart(weak, analysis["required_skills"]) is not None)
     check("Trend chart builds", build_trend_chart(analysis) is not None)
     check("Monthly trend chart builds", build_monthly_trend_chart(analysis["monthly_df"]) is not None)
+    gap_chart = build_skill_gap_chart(analysis["matched"], analysis["missing"])
+    check("Skill-gap chart has legend", bool(gap_chart.layout.showlegend))
+    check("Skill-gap chart has traces", len(gap_chart.data) >= 1)
     check("Resume gauge builds", build_resume_gauge(compat["overall"]) is not None)
     check("Career path chart builds", build_career_path_chart("FinTech Analyst", weak) is not None)
     check("Salary chart builds", build_salary_chart(jobs) is not None)
@@ -140,6 +144,7 @@ def main() -> None:
 
     check("City alias Bangalore", normalize_city_name("Bangalore") == "Bengaluru")
     check("City alias New Delhi", normalize_city_name("New Delhi") == "Delhi")
+    check("Adzuna credential preflight is boolean", isinstance(has_adzuna_credentials(), bool))
     key = build_profile_key("test profile", "Junior Data Analyst", "Chennai", "")
     history = get_profile_history(key)
     check("Snapshot history read", isinstance(history, pd.DataFrame))
