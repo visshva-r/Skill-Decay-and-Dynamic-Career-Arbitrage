@@ -140,6 +140,13 @@ def render_student_view(
         f"<p style='margin-top:0.45rem'>{top_evidence}</p></div>",
         unsafe_allow_html=True,
     )
+    focus_skill = html.escape(analysis["missing"][0]) if analysis["missing"] else "your strongest market signal"
+    evidence_count = len(analysis.get("evidence_cards") or [])
+    st.info(
+        f"**Internship story:** market evidence shows {evidence_count} signal(s); "
+        f"your next proof point is **{focus_skill}**; ship **{html.escape(str(proof_pack['title']))}** "
+        "and use the result in your resume or GitHub README."
+    )
     st.markdown(f'<div class="sp-next">{next_action}</div>', unsafe_allow_html=True)
 
     metrics = st.columns(4)
@@ -177,6 +184,7 @@ def render_student_view(
             st.markdown('<p class="section-header">Missing (high demand)</p>', unsafe_allow_html=True)
             display_skill_tags_html(analysis["missing"], "skill-missing", "No major market gaps detected.")
             st.markdown('<p class="section-header">Market evidence</p>', unsafe_allow_html=True)
+            st.caption("Evidence links the selected role × city market window to the gap you should prove next.")
             if analysis.get("evidence_cards"):
                 for card in analysis["evidence_cards"][:5]:
                     st.markdown(f'<div class="sp-evidence">{html.escape(card)}</div>', unsafe_allow_html=True)
@@ -291,6 +299,7 @@ def render_student_view(
             st.markdown('<p class="section-header">Proof pack</p>', unsafe_allow_html=True)
             st.markdown(f"**Project:** `{proof_pack['title']}`")
             st.write(proof_pack["idea"])
+            st.caption(f"Acceptance criteria: {proof_pack['acceptance_criteria']}")
             st.success(proof_pack["resume_bullet"])
             st.code(proof_pack["github_blurb"], language=None)
 
@@ -330,6 +339,7 @@ def render_student_view(
             "## Proof Pack",
             f"- Title: {proof_pack['title']}",
             f"- Idea: {proof_pack['idea']}",
+            f"- Acceptance criteria: {proof_pack['acceptance_criteria']}",
             f"- Resume Bullet: {proof_pack['resume_bullet']}",
             f"- GitHub Blurb: {proof_pack['github_blurb']}",
         ])

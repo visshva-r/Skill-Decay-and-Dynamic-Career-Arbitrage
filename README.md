@@ -25,7 +25,7 @@ SkillPulse compares learner profiles against recent role-specific job data and p
 - a skill decay risk score
 - a resume compatibility score
 - salary insights and position openings
-- month-over-month skill trend analysis
+- monthly skill trend analysis for the selected role × city evidence window
 - a 7-day micro-roadmap and proof pack
 - institutional batch dashboards and mentor exports
 
@@ -37,7 +37,7 @@ SkillPulse compares learner profiles against recent role-specific job data and p
 - Decay risk hero with evidence preview, next action, and score methodology
 - Rising/declining trends, salary/openings, career paths, benchmarks
 - 7-day roadmap, proof pack, snapshot history CSV, optional AI study plan
-- Optional Adzuna live refresh and GitHub portfolio enrichment
+- Optional Adzuna live refresh (requires both keys; missing/failed refresh keeps the current curated dataset)
 - Individual Markdown/PDF report download
 
 ### Placement Cell Mode
@@ -94,7 +94,9 @@ ADZUNA_COUNTRY=in
 GITHUB_TOKEN=your_token
 ```
 
-The core demo works offline without any API keys.
+The core demo works offline without any API keys. Adzuna refresh is opt-in and requires both
+`ADZUNA_APP_ID` and `ADZUNA_APP_KEY`; if either is missing or a request fails, SkillPulse keeps
+the curated/current dataset and does not overwrite the live cache.
 
 ## Demo Walkthrough
 
@@ -102,8 +104,9 @@ The core demo works offline without any API keys.
 1. Select **Student Mode**
 2. Choose role + city (e.g. Junior Data Analyst, Chennai)
 3. Load **Sample (Weak match)** or paste a profile → **Apply profile**
-4. Review decay risk, gaps, trends, roadmap, and proof pack
-5. Open **Micro-Curriculum** → click **Generate with Gemini** if you want the optional AI layer
+4. Follow the internship story: market evidence → top skill gap → proof project → acceptance criteria
+5. Review decay risk, gaps, trends, roadmap, and proof pack
+6. Open **Micro-Curriculum** → click **Generate with Gemini** if you want the optional AI layer
 
 ### Placement Cell Mode
 1. Select **Placement Cell Mode**
@@ -116,6 +119,15 @@ The core demo works offline without any API keys.
 
 - `streamlit`, `pandas`, `plotly`, `requests`, `python-dotenv`
 - `pdfplumber`, `python-docx`, `fpdf2` for resume parsing and PDF exports
+
+## Validation
+
+From the repository root:
+
+```bash
+python scripts/feature_smoke_test.py
+python -m compileall app.py skillpulse
+```
 
 ## Product Summary
 

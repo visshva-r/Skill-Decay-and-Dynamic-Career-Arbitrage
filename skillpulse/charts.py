@@ -46,6 +46,7 @@ def build_radar_chart(student_skills: list[str], required_skills: list[str]) -> 
     ))
     fig.update_layout(
         polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
+        title="Skill coverage vs market demand",
         showlegend=True,
         height=400,
         margin=dict(l=60, r=60, t=40, b=40),
@@ -79,7 +80,9 @@ def build_trend_chart(analysis: dict) -> go.Figure:
         barmode="group",
         height=max(300, len(trend_df) * 35),
         margin=dict(l=10, r=10, t=30, b=10),
-        xaxis_title="Mentions in Job Postings",
+        title="Recent vs older postings (30-day window)",
+        xaxis_title="Posting mentions",
+        yaxis_title="Skill",
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
     )
@@ -105,8 +108,9 @@ def build_monthly_trend_chart(monthly_df: pd.DataFrame, top_n: int = 8) -> go.Fi
     fig.update_layout(
         height=400,
         margin=dict(l=10, r=10, t=30, b=10),
+        title="Monthly skill signals",
         xaxis_title="Month",
-        yaxis_title="Mentions",
+        yaxis_title="Posting mentions",
         legend=dict(orientation="h", yanchor="bottom", y=1.02),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
@@ -118,21 +122,34 @@ def build_skill_gap_chart(matched: list[str], missing: list[str]) -> go.Figure:
     skills = matched + missing
     if not skills:
         return go.Figure()
-    colors = [MATCH] * len(matched) + [MISS] * len(missing)
-    labels = ["Matched"] * len(matched) + ["Missing"] * len(missing)
-    fig = go.Figure(go.Bar(
-        y=skills,
-        x=[1] * len(skills),
-        orientation="h",
-        marker_color=colors,
-        text=labels,
-        textposition="inside",
-    ))
+    fig = go.Figure()
+    if matched:
+        fig.add_trace(go.Bar(
+            y=matched,
+            x=[1] * len(matched),
+            orientation="h",
+            name="Matched",
+            marker_color=MATCH,
+            text=["Covered"] * len(matched),
+            textposition="inside",
+        ))
+    if missing:
+        fig.add_trace(go.Bar(
+            y=missing,
+            x=[1] * len(missing),
+            orientation="h",
+            name="Missing",
+            marker_color=MISS,
+            text=["Build proof"] * len(missing),
+            textposition="inside",
+        ))
     fig.update_layout(
         height=max(250, len(skills) * 32),
-        margin=dict(l=10, r=10, t=10, b=10),
-        xaxis=dict(visible=False),
-        showlegend=False,
+        margin=dict(l=10, r=10, t=35, b=10),
+        title="Matched vs missing high-demand skills",
+        xaxis=dict(visible=False, range=[0, 1.15]),
+        showlegend=True,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
     )

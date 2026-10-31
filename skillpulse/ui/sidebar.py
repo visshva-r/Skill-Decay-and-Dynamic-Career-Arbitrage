@@ -18,7 +18,7 @@ from skillpulse.config import (
     SAMPLE_RESUME_ALT_PATH,
     SAMPLE_RESUME_PATH,
 )
-from skillpulse.data_loader import fetch_live_jobs, standardize_jobs_df
+from skillpulse.data_loader import fetch_live_jobs, has_adzuna_credentials, standardize_jobs_df
 from skillpulse.github_enrichment import fetch_github_profile_data
 from skillpulse.resume_io import extract_text_from_upload, parse_github_username
 
@@ -180,13 +180,24 @@ def render_sidebar(jobs_df: pd.DataFrame) -> dict[str, Any]:
                     st.error(f"Could not read uploaded CSV: {error}")
             live_limit = st.slider("Live refresh size", min_value=10, max_value=80, value=30, step=10)
             if st.button("Refresh live signals"):
-                try:
-                    live_df = standardize_jobs_df(fetch_live_jobs(role=role, city=city, limit=live_limit))
-                    live_df.to_csv(LIVE_CACHE_PATH, index=False)
-                    st.success("Live refresh complete.")
-                    st.cache_data.clear()
-                except Exception as error:
-                    st.warning(f"Live refresh not available: {error}")
+                if not has_adzuna_credentials():
+                    st.info(
+                        "Using curated job signals. Add both `ADZUNA_APP_ID` and `ADZUNA_APP_KEY` "
+                        "to enable live refresh."
+                    )
+                else:
+                    try:
+                        live_df = standardize_jobs_df(fetch_live_jobs(role=role, city=city, limit=live_limit))
+                        if live_df.empty:
+                            raise RuntimeError("The live refresh returned no usable postings.")
+                        live_df.to_csv(LIVE_CACHE_PATH, index=False)
+                        st.success("Live refresh complete.")
+                        st.cache_data.clear()
+                    except Exception as error:
+                        st.warning(
+                            f"Live refresh not available: {error}. "
+                            "Your curated/current dataset was kept unchanged."
+                        )
 
     return {
         "app_mode": app_mode,
